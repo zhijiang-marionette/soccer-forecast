@@ -1,10 +1,12 @@
 from exts import db
 
+# 队伍信息
 class Team(db.Model):
     __tablename__ = 'team'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255), unique=True, index=True) # 队伍名称
 
+# 比赛基本信息
 class Game(db.Model):
     __tablename__ = 'game'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -21,6 +23,7 @@ class Game(db.Model):
     goals = db.Column(db.Integer, nullable=False)
     half = db.Column(db.String(255), nullable=False)
 
+# 胜平负奖金信息
 class Simple(db.Model):
     __tablename__ = 'simple'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -30,6 +33,7 @@ class Simple(db.Model):
     draw_price = db.Column(db.Integer, nullable=False)
     lose_price = db.Column(db.Integer, nullable=False)
 
+# 让球胜平负信息
 class Rang(db.Model):
     __tablename__ = 'rang'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -40,6 +44,7 @@ class Rang(db.Model):
     rang_draw_price = db.Column(db.Integer, nullable=False)
     rang_lose_price = db.Column(db.Integer, nullable=False)
 
+# 进球数奖金信息
 class Goals(db.Model):
     __tablename__ = 'goals'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -54,6 +59,7 @@ class Goals(db.Model):
     six_price = db.Column(db.Integer, nullable=False)
     seven_price = db.Column(db.Integer, nullable=False)
 
+# 半全场奖金信息
 class Half(db.Model):
     __tablename__ = 'half'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

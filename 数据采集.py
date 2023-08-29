@@ -65,45 +65,58 @@ def find_game():
 
 # 获取胜平负信息
 def find_simple():
-    date_time = find('//*[@id="had_tb"]/tr[1]/td[1]')
-    win_price = find('//*[@id="had_tb"]/tr[2]/td[2]')
-    draw_price = find('//*[@id="had_tb"]/tr[3]/td[3]')
-    lose_price = find('//*[@id="had_tb"]/tr[4]/td[4]')
+    i = 1
+    while find('//*[@id="had_tb"]/tr[' + str(i) + ']') != '':
+        path = '//*[@id="had_tb"]/tr[' + str(i) + ']'
+        date_time = find(path + '/td[1]')
+        win_price = find(path + '/td[2]')
+        draw_price = find(path + '/td[3]')
+        lose_price = find(path + '/td[4]')
 
-    # 1.创建ORM对象
-    simple = Simple(game_id=game_id, date_time=date_time, win_price=win_price, draw_price=draw_price, lose_price=lose_price)
-    # 2.将ORM对象添加到db.session中
-    db.session.add(simple)
-    # 3.将db.session中的改变同步到数据库中
-    db.session.commit()
+        # 1.创建ORM对象
+        simple = Simple(game_id=game_id, date_time=date_time, win_price=win_price, draw_price=draw_price,
+                        lose_price=lose_price)
+        # 2.将ORM对象添加到db.session中
+        db.session.add(simple)
+        # 3.将db.session中的改变同步到数据库中
+        db.session.commit()
+
+    i += 1
 
 # 获取让球胜平负信息
 def find_rang():
-    date_time = find('//*[@id="hhad_tb"]/tr[1]/td[1]')
-    rang_win_price = find('//*[@id="hhad_tb"]/tr[1]/td[2]')
-    rang_draw_price = find('//*[@id="hhad_tb"]/tr[1]/td[3]')
-    rang_lose_price = find('//*[@id="hhad_tb"]/tr[1]/td[4]')
+    i = 1
+    while find('//*[@id="hhad_tb"]/tr[' + str(i) + ']') != '':
+        path = '//*[@id="hhad_tb"]/tr[' + str(i) + ']'
+        date_time = find(path + '/td[1]')
+        rang_win_price = find(path + '/td[2]')
+        rang_draw_price = find(path + '/td[3]')
+        rang_lose_price = find(path + '/td[4]')
 
-    # 1.创建ORM对象
-    rang = Simple(game_id=game_id, date_time=date_time, rang_win_price=rang_win_price, rang_draw_price=rang_draw_price, rang_lose_price=rang_lose_price)
-    # 2.将ORM对象添加到db.session中
-    db.session.add(rang)
-    # 3.将db.session中的改变同步到数据库中
-    db.session.commit()
+        # 1.创建ORM对象
+        rang = Simple(game_id=game_id, date_time=date_time, rang_win_price=rang_win_price,
+                      rang_draw_price=rang_draw_price, rang_lose_price=rang_lose_price)
+        # 2.将ORM对象添加到db.session中
+        db.session.add(rang)
+        # 3.将db.session中的改变同步到数据库中
+        db.session.commit()
+
+    i += 1
 
 # 获取总进球数信息
 def find_goals():
     i = 1
     while find('//*[@id="ttg_tb"]/tr[' + str(i) + ']') != '':
-        date_time = find('//*[@id="ttg_tb"]/tr[1]/td[1]')
-        zero_price = find('//*[@id="ttg_tb"]/tr[1]/td[2]')
-        one_price = find('//*[@id="ttg_tb"]/tr[1]/td[3]')
-        two_price = find('//*[@id="ttg_tb"]/tr[1]/td[4]')
-        there_price = find('//*[@id="ttg_tb"]/tr[1]/td[5]')
-        four_price = find('//*[@id="ttg_tb"]/tr[1]/td[6]')
-        five_price = find('//*[@id="ttg_tb"]/tr[1]/td[7]')
-        six_price = find('//*[@id="ttg_tb"]/tr[1]/td[8]')
-        seven_price = find('//*[@id="ttg_tb"]/tr[1]/td[9]')
+        path = '//*[@id="ttg_tb"]/tr[' + str(i) + ']'
+        date_time = find(path + '/td[1]')
+        zero_price = find(path + '/td[2]')
+        one_price = find(path + '/td[3]')
+        two_price = find(path + '/td[4]')
+        there_price = find(path + '/td[5]')
+        four_price = find(path + '/td[6]')
+        five_price = find(path + '/td[7]')
+        six_price = find(path + '/td[8]')
+        seven_price = find(path + '/td[9]')
 
         # 1.创建ORM对象
         goals = Goals(game_id=game_id, date_time=date_time, zero_price=zero_price, one_price=one_price,
@@ -111,6 +124,33 @@ def find_goals():
                       six_price=six_price, seven_price=seven_price)
         # 2.将ORM对象添加到db.session中
         db.session.add(goals)
+        # 3.将db.session中的改变同步到数据库中
+        db.session.commit()
+
+        i += 1
+
+# 获取半全场信息
+def find_half():
+    i = 1
+    while find('//*[@id="hafu_tb"]/tr[' + str(i) + ']') != '':
+        path = '//*[@id="hafu_tb"]/tr[' + str(i) + ']'
+        date_time = find(path + '/td[1]')  # 发布时间
+        win_win = find(path + '/td[2]')
+        draw_win = find(path + '/td[3]')
+        lose_win = find(path + '/td[4]')
+        win_draw = find(path + '/td[5]')
+        draw_draw = find(path + '/td[6]')
+        lose_draw = find(path + '/td[7]')
+        win_lose = find(path + '/td[8]')
+        draw_lose = find(path + '/td[9]')
+        lose_lose = find(path + '/td[10]')
+
+        # 1.创建ORM对象
+        half = Half(game_id=game_id, win_win=win_win, draw_win=draw_win, lose_win=lose_win,
+                      win_draw=win_draw, draw_draw=draw_draw, lose_draw=lose_draw, win_lose=win_lose,
+                      draw_lose=draw_lose, lose_lose=lose_lose)
+        # 2.将ORM对象添加到db.session中
+        db.session.add(half)
         # 3.将db.session中的改变同步到数据库中
         db.session.commit()
 
