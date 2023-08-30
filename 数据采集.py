@@ -69,9 +69,9 @@ def find_simple():
     while find('//*[@id="had_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="had_tb"]/tr[' + str(i) + ']').split(' ')
         date_time = arr[0] + '' + arr[1]
-        win_price = str(arr[2])
-        draw_price = str(arr[3])
-        lose_price = str(arr[4])
+        win_price = int(arr[2])
+        draw_price = int(arr[3])
+        lose_price = int(arr[4])
 
         # 1.创建ORM对象
         simple = Simple(game_id=game_id, date_time=date_time, win_price=win_price, draw_price=draw_price,
@@ -89,9 +89,9 @@ def find_rang():
     while find('//*[@id="hhad_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="hhad_tb"]/tr[' + str(i) + ']').split(' ')
         date_time = arr[0] + '' + arr[1]
-        rang_win_price = str(arr[2])
-        rang_draw_price = str(arr[3])
-        rang_lose_price = str(arr[4])
+        rang_win_price = int(arr[2])
+        rang_draw_price = int(arr[3])
+        rang_lose_price = int(arr[4])
 
         # 1.创建ORM对象
         rang = Simple(game_id=game_id, date_time=date_time, rang_win_price=rang_win_price,
@@ -109,14 +109,14 @@ def find_goals():
     while find('//*[@id="ttg_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="ttg_tb"]/tr[' + str(i) + ']').split(' ')
         date_time = arr[0] + '' + arr[1]
-        zero_price = str(arr[3])
-        one_price = str(arr[4])
-        two_price = str(arr[5])
-        there_price = str(arr[6])
-        four_price = str(arr[7])
-        five_price = str(arr[8])
-        six_price = str(arr[9])
-        seven_price = str(arr[10])
+        zero_price = int(arr[3])
+        one_price = int(arr[4])
+        two_price = int(arr[5])
+        there_price = int(arr[6])
+        four_price = int(arr[7])
+        five_price = int(arr[8])
+        six_price = int(arr[9])
+        seven_price = int(arr[10])
 
         # 1.创建ORM对象
         goals = Goals(game_id=game_id, date_time=date_time, zero_price=zero_price, one_price=one_price,
@@ -135,15 +135,15 @@ def find_half():
     while find('//*[@id="hafu_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="hafu_tb"]/tr[' + str(i) + ']').split(' ')
         date_time = arr[0] + '' + arr[1]
-        win_win = str(arr[2])
-        draw_win = str(arr[3])
-        lose_win = str(arr[4])
-        win_draw = str(arr[5])
-        draw_draw = str(arr[6])
-        lose_draw = str(arr[7])
-        win_lose = str(arr[8])
-        draw_lose = str(arr[9])
-        lose_lose = str(arr[10])
+        win_win = int(arr[2])
+        draw_win = int(arr[3])
+        lose_win = int(arr[4])
+        win_draw = int(arr[5])
+        draw_draw = int(arr[6])
+        lose_draw = int(arr[7])
+        win_lose = int(arr[8])
+        draw_lose = int(arr[9])
+        lose_lose = int(arr[10])
 
         # 1.创建ORM对象
         half = Half(game_id=game_id, date_time=date_time, win_win=win_win, draw_win=draw_win, lose_win=lose_win,
@@ -166,7 +166,11 @@ driver.maximize_window()
 # 等待页面渲染
 sleep(5)
 
+# 测试：新建窗口
+driver.execute_script("window.open('https://www.baidu.com/')")
+driver.switch_to.window(driver.window_handles[1])
+
 game_id = 0
 
 # 退出驱动
-driver.quit()
+# driver.quit()
