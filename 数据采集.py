@@ -170,7 +170,9 @@ sleep(5)
 driver.execute_script("window.open('https://www.baidu.com/')")
 driver.switch_to.window(driver.window_handles[1])
 
+driver.find_element(By.ID, 'kw').send_keys('hello python')
+sleep(5)
 game_id = 0
 
 # 退出驱动
-# driver.quit()
+driver.quit()
