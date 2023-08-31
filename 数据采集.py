@@ -166,9 +166,19 @@ driver.maximize_window()
 # 等待页面渲染
 sleep(5)
 
+
+# 获取初始窗口句柄
+initial_window = driver.current_window_handle
+
 # 测试：新建窗口
-driver.execute_script("window.open('https://www.baidu.com/')")
+driver.execute_script("window.open('', '_blank');")
 driver.switch_to.window(driver.window_handles[1])
+driver.get("https://www.baidu.com")
+driver.close()
+
+
+# 切换回初始窗口
+driver.switch_to.window(initial_window)
 
 driver.find_element(By.ID, 'kw').send_keys('hello python')
 sleep(5)
