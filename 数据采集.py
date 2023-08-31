@@ -174,14 +174,14 @@ initial_window = driver.current_window_handle
 driver.execute_script("window.open('', '_blank');")
 driver.switch_to.window(driver.window_handles[1])
 driver.get("https://www.baidu.com")
+driver.find_element(By.ID, 'kw').send_keys('hello python')
+sleep(5)
 driver.close()
 
 
 # 切换回初始窗口
 driver.switch_to.window(initial_window)
-
-driver.find_element(By.ID, 'kw').send_keys('hello python')
-sleep(5)
+sleep(2)
 game_id = 0
 
 # 退出驱动
