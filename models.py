@@ -23,6 +23,9 @@ class Game(db.Model):
     goals = db.Column(db.Integer, nullable=False)
     half = db.Column(db.String(255), nullable=False)
 
+    # 链接
+    url = db.Column(db.String(255), nullable=False)
+
 # 胜平负奖金信息
 class Simple(db.Model):
     __tablename__ = 'simple'
