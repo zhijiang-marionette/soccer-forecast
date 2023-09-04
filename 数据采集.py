@@ -3,6 +3,7 @@ from time import sleep
 from selenium.webdriver.common.by import By
 from exts import db
 from models import *
+from datetime import datetime
 
 # 根据XPATH定位元素
 def find(path):
@@ -12,11 +13,17 @@ def find(path):
 # 获取比赛信息
 def find_game():
     global game_id
+    # 判断是否为单关
+    try:
+        driver.find_element(by=By.XPATH, value='//*[@id="had_title"]/em')
+        dan = True
+    except:
+        dan = False
     # 比赛场次
     session = find('/html/body/div[3]/div[6]/div[1]/div/div[3]/div[1]')
     # 比赛时间
-    game_time = find('/html/body/div[3]/div[6]/div[1]/div/div[3]/div[3]/span[2]') + ' ' + find(
-        '/html/body/div[3]/div[6]/div[1]/div/div[3]/div[3]/span[3]')
+    game_time = datetime.strptime(find('/html/body/div[3]/div[6]/div[1]/div/div[3]/div[3]/span[2]') + ' ' + find(
+        '/html/body/div[3]/div[6]/div[1]/div/div[3]/div[3]/span[3]'), '%Y-%m-%d %H:%M:%S')
     # 主队
     host = find('/html/body/div[3]/div[6]/div[1]/div/div[3]/div[2]/div[2]').split(' ')[0]
     # 客队
@@ -54,7 +61,7 @@ def find_game():
         guest_id = Team.query.filter_by(name=guest)
 
     # 创建ORM对象
-    game = Game(dan=False, host_id=host_id, guest_id=guest_id, game_time=game_time, session=session, simple=simple, rang=rang, score=score, goals=goals, half=half)
+    game = Game(dan=dan, host_id=host_id, guest_id=guest_id, game_time=game_time, session=session, simple=simple, rang=rang, score=score, goals=goals, half=half, url=url)
     # 将ORM对象添加到db.session中
     db.session.add(game)
     # 将db.session中的改变同步到数据库中
@@ -68,7 +75,7 @@ def find_simple():
     i = 1
     while find('//*[@id="had_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="had_tb"]/tr[' + str(i) + ']').split(' ')
-        date_time = arr[0] + '' + arr[1]
+        date_time = datetime.strptime(arr[0] + '' + arr[1], '%Y-%m-%d %H:%M:%S')
         win_price = int(arr[2])
         draw_price = int(arr[3])
         lose_price = int(arr[4])
@@ -88,7 +95,7 @@ def find_rang():
     i = 1
     while find('//*[@id="hhad_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="hhad_tb"]/tr[' + str(i) + ']').split(' ')
-        date_time = arr[0] + '' + arr[1]
+        date_time = datetime.strptime(arr[0] + '' + arr[1], '%Y-%m-%d %H:%M:%S')
         rang_win_price = int(arr[2])
         rang_draw_price = int(arr[3])
         rang_lose_price = int(arr[4])
@@ -108,7 +115,7 @@ def find_goals():
     i = 1
     while find('//*[@id="ttg_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="ttg_tb"]/tr[' + str(i) + ']').split(' ')
-        date_time = arr[0] + '' + arr[1]
+        date_time = datetime.strptime(arr[0] + '' + arr[1], '%Y-%m-%d %H:%M:%S')
         zero_price = int(arr[3])
         one_price = int(arr[4])
         two_price = int(arr[5])
@@ -134,7 +141,7 @@ def find_half():
     i = 1
     while find('//*[@id="hafu_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="hafu_tb"]/tr[' + str(i) + ']').split(' ')
-        date_time = arr[0] + '' + arr[1]
+        date_time = datetime.strptime(arr[0] + '' + arr[1], '%Y-%m-%d %H:%M:%S')
         win_win = int(arr[2])
         draw_win = int(arr[3])
         lose_win = int(arr[4])
@@ -156,33 +163,48 @@ def find_half():
 
         i += 1
 
+url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=60000'
 # 构建驱动
 driver = webdriver.Chrome()
 # 前往网站
-driver.get(
-    'https://www.lottery.gov.cn/jc/zqgdjj/?m=100026')
+driver.get('https://www.lottery.gov.cn/jc/zqgdjj/?m=60000')
 # 最大化窗口
 driver.maximize_window()
 # 等待页面渲染
 sleep(5)
 
-
-# 获取初始窗口句柄
-initial_window = driver.current_window_handle
-
-# 测试：新建窗口
-driver.execute_script("window.open('', '_blank');")
-driver.switch_to.window(driver.window_handles[1])
-driver.get("https://www.baidu.com")
-driver.find_element(By.ID, 'kw').send_keys('hello python')
-sleep(5)
-driver.close()
-
-
-# 切换回初始窗口
-driver.switch_to.window(initial_window)
-sleep(2)
 game_id = 0
+
+for j in range(60001, 70000):
+    # 判断是否为无效网址
+    if not find('//*[@id="hLeague"]/div[1]'):
+        continue
+
+    # 爬取历史奖金信息
+    find_game()
+    find_simple()
+    find_rang()
+    find_goals()
+    find_half()
+
+    print(url, '数据已爬取完毕')
+
+    url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=' + str(0) + str(
+        j) if j < 100000 else 'https://www.lottery.gov.cn/jc/zqgdjj/?m=' + str(j)
+
+    # 新开窗口
+    driver.execute_script("window.open('', '_blank');")
+    driver.switch_to.window(driver.window_handles[1])
+    driver.get(url)
+
+    # 切换回初始窗口
+    driver.switch_to.window(driver.window_handles[0])
+    # 关闭原始窗口
+    driver.close()
+    sleep(5)
+    # 重新定位窗口
+    driver.switch_to.window(driver.window_handles[0])
+    sleep(2)
 
 # 退出驱动
 driver.quit()
