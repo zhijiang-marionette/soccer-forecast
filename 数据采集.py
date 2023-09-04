@@ -118,10 +118,9 @@ def find_rang():
 
 # 获取总进球数信息
 def find_goals():
-    i = 1
-    while find('//*[@id="ttg_tb"]/tr[' + str(i) + ']') != '':
-        arr = find('//*[@id="ttg_tb"]/tr[' + str(i) + ']').split(' ')
-        print(arr)
+    element_arr = driver.find_elements(by=By.XPATH, value='//*[@id="ttg_tb"]/tr')
+    for j in range(len(element_arr)):
+        arr = find('//*[@id="ttg_tb"]/tr[' + str(j + 1) + ']').split(' ')
         date_time = datetime.strptime(arr[0] + ' ' + arr[1], '%Y-%m-%d %H:%M:%S')
         zero_price = float(arr[2])
         one_price = float(arr[3])
@@ -141,13 +140,12 @@ def find_goals():
         # 3.将db.session中的改变同步到数据库中
         db.session.commit()
 
-        i += 1
 
 # 获取半全场信息
 def find_half():
-    i = 1
-    while find('//*[@id="hafu_tb"]/tr[' + str(i) + ']') != '':
-        arr = find('//*[@id="hafu_tb"]/tr[' + str(i) + ']').split(' ')
+    element_arr = driver.find_elements(by=By.XPATH, value='//*[@id="hafu_tb"]/tr')
+    for j in range(len(element_arr)):
+        arr = find('//*[@id="hafu_tb"]/tr[' + str(j + 1) + ']').split(' ')
         date_time = datetime.strptime(arr[0] + ' ' + arr[1], '%Y-%m-%d %H:%M:%S')
         win_win = float(arr[2])
         draw_win = float(arr[3])
@@ -167,8 +165,6 @@ def find_half():
         db.session.add(half)
         # 3.将db.session中的改变同步到数据库中
         db.session.commit()
-
-        i += 1
 
 url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=60000'
 # 构建驱动
