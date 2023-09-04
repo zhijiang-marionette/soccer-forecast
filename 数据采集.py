@@ -92,8 +92,8 @@ def find_simple():
         db.session.add(simple)
         # 3.将db.session中的改变同步到数据库中
         db.session.commit()
+        i += 1
 
-    i += 1
 
 # 获取让球胜平负信息
 def find_rang():
