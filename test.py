@@ -11,4 +11,4 @@ driver = webdriver.Chrome()
 # 前往网站
 driver.get('https://www.lottery.gov.cn/jc/zqgdjj/?m=60000')
 
-print(find('//*[@id="leagueMatch"]'))
+print(find('//*[@id="hhad_title"]/span')[1:3])

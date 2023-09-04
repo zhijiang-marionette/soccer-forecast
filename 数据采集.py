@@ -39,10 +39,10 @@ def find_game():
 
     # 存储结果
     # 获取队伍id
-    host_id = Team.query.filter_by(name=host).all()
-    guest_id = Team.query.filter_by(name=guest).all()
+    host_team = Team.query.filter_by(name=host).all()
+    guest_team = Team.query.filter_by(name=guest).all()
     # 需考虑队伍没有入库的情况
-    if len(host_id) == 0:
+    if len(host_team) == 0:
         # 1.创建ORM对象
         team = Team(name=host)
         # 2.将ORM对象添加到db.session中
@@ -50,8 +50,10 @@ def find_game():
         # 3.将db.session中的改变同步到数据库中
         db.session.commit()
         # 4.获取id
-        host_id = Team.query.filter_by(name=host)
-    if len(guest_id) == 0:
+        host_id = Team.query.filter_by(name=host).all()[0].id
+    else:
+        host_id = Team.query.filter_by(name=host).all()[0].id
+    if len(guest_team) == 0:
         # 1.创建ORM对象
         team = Team(name=guest)
         # 2.将ORM对象添加到db.session中
@@ -59,7 +61,9 @@ def find_game():
         # 3.将db.session中的改变同步到数据库中
         db.session.commit()
         # 4.获取id
-        guest_id = Team.query.filter_by(name=guest)
+        guest_id = Team.query.filter_by(name=guest).all()[0].id
+    else:
+        guest_id = Team.query.filter_by(name=guest).all()[0].id
 
     # 创建ORM对象
     game = Game(dan=dan, host_id=host_id, guest_id=guest_id, game_time=game_time, session=session, simple=simple, rang=rang, score=score, goals=goals, half=half, url=url)
@@ -69,17 +73,17 @@ def find_game():
     db.session.commit()
 
     # 返回比赛id
-    game_id = Team.query.filter_by(session=session)
+    game_id = Game.query.filter_by(session=session).all()[0].id
 
 # 获取胜平负信息
 def find_simple():
     i = 1
     while find('//*[@id="had_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="had_tb"]/tr[' + str(i) + ']').split(' ')
-        date_time = datetime.strptime(arr[0] + '' + arr[1], '%Y-%m-%d %H:%M:%S')
-        win_price = int(arr[2])
-        draw_price = int(arr[3])
-        lose_price = int(arr[4])
+        date_time = datetime.strptime(arr[0] + ' ' + arr[1], '%Y-%m-%d %H:%M:%S')
+        win_price = float(arr[2])
+        draw_price = float(arr[3])
+        lose_price = float(arr[4])
 
         # 1.创建ORM对象
         simple = Simple(game_id=game_id, date_time=date_time, win_price=win_price, draw_price=draw_price,
@@ -96,13 +100,14 @@ def find_rang():
     i = 1
     while find('//*[@id="hhad_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="hhad_tb"]/tr[' + str(i) + ']').split(' ')
-        date_time = datetime.strptime(arr[0] + '' + arr[1], '%Y-%m-%d %H:%M:%S')
-        rang_win_price = int(arr[2])
-        rang_draw_price = int(arr[3])
-        rang_lose_price = int(arr[4])
+        date_time = datetime.strptime(arr[0] + ' ' + arr[1], '%Y-%m-%d %H:%M:%S')
+        rangfou = find('//*[@id="hhad_title"]/span')[1:3]
+        rang_win_price = float(arr[2])
+        rang_draw_price = float(arr[3])
+        rang_lose_price = float(arr[4])
 
         # 1.创建ORM对象
-        rang = Simple(game_id=game_id, date_time=date_time, rang_win_price=rang_win_price,
+        rang = Simple(rangfou=rangfou, game_id=game_id, date_time=date_time, rang_win_price=rang_win_price,
                       rang_draw_price=rang_draw_price, rang_lose_price=rang_lose_price)
         # 2.将ORM对象添加到db.session中
         db.session.add(rang)
@@ -116,15 +121,15 @@ def find_goals():
     i = 1
     while find('//*[@id="ttg_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="ttg_tb"]/tr[' + str(i) + ']').split(' ')
-        date_time = datetime.strptime(arr[0] + '' + arr[1], '%Y-%m-%d %H:%M:%S')
-        zero_price = int(arr[3])
-        one_price = int(arr[4])
-        two_price = int(arr[5])
-        there_price = int(arr[6])
-        four_price = int(arr[7])
-        five_price = int(arr[8])
-        six_price = int(arr[9])
-        seven_price = int(arr[10])
+        date_time = datetime.strptime(arr[0] + ' ' + arr[1], '%Y-%m-%d %H:%M:%S')
+        zero_price = float(arr[3])
+        one_price = float(arr[4])
+        two_price = float(arr[5])
+        there_price = float(arr[6])
+        four_price = float(arr[7])
+        five_price = float(arr[8])
+        six_price = float(arr[9])
+        seven_price = float(arr[10])
 
         # 1.创建ORM对象
         goals = Goals(game_id=game_id, date_time=date_time, zero_price=zero_price, one_price=one_price,
@@ -142,16 +147,16 @@ def find_half():
     i = 1
     while find('//*[@id="hafu_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="hafu_tb"]/tr[' + str(i) + ']').split(' ')
-        date_time = datetime.strptime(arr[0] + '' + arr[1], '%Y-%m-%d %H:%M:%S')
-        win_win = int(arr[2])
-        draw_win = int(arr[3])
-        lose_win = int(arr[4])
-        win_draw = int(arr[5])
-        draw_draw = int(arr[6])
-        lose_draw = int(arr[7])
-        win_lose = int(arr[8])
-        draw_lose = int(arr[9])
-        lose_lose = int(arr[10])
+        date_time = datetime.strptime(arr[0] + ' ' + arr[1], '%Y-%m-%d %H:%M:%S')
+        win_win = float(arr[2])
+        draw_win = float(arr[3])
+        lose_win = float(arr[4])
+        win_draw = float(arr[5])
+        draw_draw = float(arr[6])
+        lose_draw = float(arr[7])
+        win_lose = float(arr[8])
+        draw_lose = float(arr[9])
+        lose_lose = float(arr[10])
 
         # 1.创建ORM对象
         half = Half(game_id=game_id, date_time=date_time, win_win=win_win, draw_win=draw_win, lose_win=lose_win,
@@ -168,7 +173,7 @@ url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=60000'
 # 构建驱动
 driver = webdriver.Chrome()
 # 前往网站
-driver.get('https://www.lottery.gov.cn/jc/zqgdjj/?m=60000')
+driver.get(url)
 # 最大化窗口
 driver.maximize_window()
 # 等待页面渲染
