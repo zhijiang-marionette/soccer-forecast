@@ -107,33 +107,34 @@ def find_rang():
         rang_lose_price = float(arr[4])
 
         # 1.创建ORM对象
-        rang = Simple(rangfou=rangfou, game_id=game_id, date_time=date_time, rang_win_price=rang_win_price,
+        rang = Rang(rangfou=rangfou, game_id=game_id, date_time=date_time, rang_win_price=rang_win_price,
                       rang_draw_price=rang_draw_price, rang_lose_price=rang_lose_price)
         # 2.将ORM对象添加到db.session中
         db.session.add(rang)
         # 3.将db.session中的改变同步到数据库中
         db.session.commit()
 
-    i += 1
+        i += 1
 
 # 获取总进球数信息
 def find_goals():
     i = 1
     while find('//*[@id="ttg_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="ttg_tb"]/tr[' + str(i) + ']').split(' ')
+        print(arr)
         date_time = datetime.strptime(arr[0] + ' ' + arr[1], '%Y-%m-%d %H:%M:%S')
-        zero_price = float(arr[3])
-        one_price = float(arr[4])
-        two_price = float(arr[5])
-        there_price = float(arr[6])
-        four_price = float(arr[7])
-        five_price = float(arr[8])
-        six_price = float(arr[9])
-        seven_price = float(arr[10])
+        zero_price = float(arr[2])
+        one_price = float(arr[3])
+        two_price = float(arr[4])
+        there_price = float(arr[5])
+        four_price = float(arr[6])
+        five_price = float(arr[7])
+        six_price = float(arr[8])
+        seven_price = float(arr[9])
 
         # 1.创建ORM对象
         goals = Goals(game_id=game_id, date_time=date_time, zero_price=zero_price, one_price=one_price,
-                      two_pricee=two_price, there_price=there_price, four_price=four_price, five_price=five_price,
+                      two_price=two_price, there_price=there_price, four_price=four_price, five_price=five_price,
                       six_price=six_price, seven_price=seven_price)
         # 2.将ORM对象添加到db.session中
         db.session.add(goals)

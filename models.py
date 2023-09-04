@@ -52,7 +52,7 @@ class Goals(db.Model):
     __tablename__ = 'goals'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     game_id = db.Column(db.Integer, nullable=False)  # 关联比赛id
-    date_time = db.Column(db.Float, nullable=False)  # 发布时间
+    date_time = db.Column(db.DateTime, nullable=False)  # 发布时间
     zero_price = db.Column(db.Float, nullable=False)
     one_price = db.Column(db.Float, nullable=False)
     two_price = db.Column(db.Float, nullable=False)
