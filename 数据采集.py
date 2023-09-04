@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from exts import db
 from models import *
 from datetime import datetime
+from app import app
 
 # 根据XPATH定位元素
 def find(path):
@@ -38,8 +39,8 @@ def find_game():
 
     # 存储结果
     # 获取队伍id
-    host_id = Team.query.filter_by(name=host)
-    guest_id = Team.query.filter_by(name=guest)
+    host_id = Team.query.filter_by(name=host).all()
+    guest_id = Team.query.filter_by(name=guest).all()
     # 需考虑队伍没有入库的情况
     if len(host_id) == 0:
         # 1.创建ORM对象
@@ -177,15 +178,16 @@ game_id = 0
 
 for j in range(60001, 70000):
     # 判断是否为无效网址
-    if not find('//*[@id="hLeague"]/div[1]'):
+    if not find('//*[@id="leagueMatch"]'):
         continue
 
     # 爬取历史奖金信息
-    find_game()
-    find_simple()
-    find_rang()
-    find_goals()
-    find_half()
+    with app.app_context():
+        find_game()
+        find_simple()
+        find_rang()
+        find_goals()
+        find_half()
 
     print(url, '数据已爬取完毕')
 
