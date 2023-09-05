@@ -34,7 +34,7 @@ def find_game():
     simple = find('/html/body/div[3]/div[6]/div[2]/table[1]/tbody/tr[1]/td[1]/strong')
     rang = find('/html/body/div[3]/div[6]/div[2]/table[1]/tbody/tr[2]/td[1]/strong')
     score = find('/html/body/div[3]/div[6]/div[2]/table[1]/tbody/tr[3]/td[1]/strong')
-    goals = int(find('/html/body/div[3]/div[6]/div[2]/table[1]/tbody/tr[4]/td[1]/strong'))
+    goals = int(find('/html/body/div[3]/div[6]/div[2]/table[1]/tbody/tr[4]/td[1]/strong')[0])
     half = find('/html/body/div[3]/div[6]/div[2]/table[1]/tbody/tr[5]/td[1]/strong')
 
     # 存储结果
@@ -80,6 +80,8 @@ def find_simple():
     i = 1
     while find('//*[@id="had_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="had_tb"]/tr[' + str(i) + ']').split(' ')
+        if arr[0] == '暂无数据':
+            break
         date_time = datetime.strptime(arr[0] + ' ' + arr[1], '%Y-%m-%d %H:%M:%S')
         win_price = float(arr[2])
         draw_price = float(arr[3])
@@ -166,7 +168,7 @@ def find_half():
         # 3.将db.session中的改变同步到数据库中
         db.session.commit()
 
-url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=60000'
+url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=60043'
 # 构建驱动
 driver = webdriver.Chrome()
 # 前往网站
@@ -178,7 +180,7 @@ sleep(5)
 
 game_id = 0
 
-for j in range(60001, 70000):
+for j in range(60044, 70000):
     # 判断是否为无效网址
     if not find('//*[@id="leagueMatch"]'):
         continue
