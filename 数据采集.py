@@ -168,28 +168,31 @@ def find_half():
         # 3.将db.session中的改变同步到数据库中
         db.session.commit()
 
-url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=60043'
+url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=060429'
 # 构建驱动
 driver = webdriver.Chrome()
 # 前往网站
 driver.get(url)
 # 最大化窗口
-driver.maximize_window()
+# driver.maximize_window()
 # 等待页面渲染
 sleep(5)
 
 game_id = 0
 
-for j in range(60044, 70000):
+for j in range(60430, 70000):
     # 判断是否为有效网址
     if find('//*[@id="leagueMatch"]'):
-        # 爬取历史奖金信息
-        with app.app_context():
-            find_game()
-            find_simple()
-            find_rang()
-            find_goals()
-            find_half()
+        try:
+            find('//*[@id="rs_tb"]/tr[1]/td[1]/strong')
+        except:
+            # 爬取历史奖金信息
+            with app.app_context():
+                find_game()
+                find_simple()
+                find_rang()
+                find_goals()
+                find_half()
 
     print(url, '数据已爬取完毕')
 
