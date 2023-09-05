@@ -181,17 +181,15 @@ sleep(5)
 game_id = 0
 
 for j in range(60044, 70000):
-    # 判断是否为无效网址
-    if not find('//*[@id="leagueMatch"]'):
-        continue
-
-    # 爬取历史奖金信息
-    with app.app_context():
-        find_game()
-        find_simple()
-        find_rang()
-        find_goals()
-        find_half()
+    # 判断是否为有效网址
+    if find('//*[@id="leagueMatch"]'):
+        # 爬取历史奖金信息
+        with app.app_context():
+            find_game()
+            find_simple()
+            find_rang()
+            find_goals()
+            find_half()
 
     print(url, '数据已爬取完毕')
 
