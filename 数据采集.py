@@ -185,19 +185,18 @@ game_id = 0
 for j in range(100486, 110000):
     # 判断是否为有效网址
     if find('//*[@id="leagueMatch"]'):
-        if find('//*[@id="rs_tb"]/tr[1]/td[1]/strong') == '暂无数据':
-            continue
-        # 爬取历史奖金信息
-        with app.app_context():
-            find_game()
-            find_simple()
-            find_rang()
-            find_goals()
-            find_half()
-        print(url, '数据已爬取完毕')
+        # 判断是否有比赛结果信息
+        if find('//*[@id="rs_tb"]/tr[1]/td[1]/strong') != '暂无数据':
+            # 爬取历史奖金信息
+            with app.app_context():
+                find_game()
+                find_simple()
+                find_rang()
+                find_goals()
+                find_half()
+            print(url, '数据已爬取完毕')
 
-    url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=' + str(0) + str(
-        j) if j < 100000 else 'https://www.lottery.gov.cn/jc/zqgdjj/?m=' + str(j)
+    url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=' + str(j)
 
     # 新开窗口
     driver.execute_script("window.open('', '_blank');")
