@@ -5,7 +5,7 @@ def find(path):
     global driver
     return driver.find_element(by=By.XPATH, value=path).text
 
-url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=060248'
+url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=100487'
 # 构建驱动
 driver = webdriver.Chrome()
 # 前往网站
