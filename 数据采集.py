@@ -5,6 +5,10 @@ from exts import db
 from models import *
 from datetime import datetime
 from app import app
+from flask_mail import Mail, Message
+
+# 创建mail实例
+mail = Mail(app)
 
 # 根据XPATH定位元素
 def find(path):
@@ -187,14 +191,22 @@ for j in range(100486, 110000):
     if find('//*[@id="leagueMatch"]'):
         # 判断是否有比赛结果信息
         if find('//*[@id="rs_tb"]/tr[1]/td[1]/strong') != '暂无数据':
-            # 爬取历史奖金信息
-            with app.app_context():
-                find_game()
-                find_simple()
-                find_rang()
-                find_goals()
-                find_half()
-            print(url, '数据已爬取完毕')
+            try:
+                # 爬取历史奖金信息
+                with app.app_context():
+                    find_game()
+                    find_simple()
+                    find_rang()
+                    find_goals()
+                    find_half()
+                print(url, '数据已爬取完毕')
+            except Exception as e:
+                msg = Message(url + '运行中断，请及时恢复', sender='1814286995@qq.com', recipients=['962395743@qq.com'])
+                msg.body = e
+                # 发送邮件
+                mail.send(msg)
+                # 终止程序
+                break
 
     url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=' + str(j)
 
