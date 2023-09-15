@@ -1,14 +1,21 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-def find(path):
-    global driver
-    return driver.find_element(by=By.XPATH, value=path).text
+# def find(path):
+#     global driver
+#     return driver.find_element(by=By.XPATH, value=path).text
+#
+# url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=100487'
+# # 构建驱动
+# driver = webdriver.Chrome()
+# # 前往网站
+# driver.get(url)
+#
+# print(find('//*[@id="rs_tb"]/tr[1]/td[1]/strong'))
 
-url = 'https://www.lottery.gov.cn/jc/zqgdjj/?m=100487'
-# 构建驱动
-driver = webdriver.Chrome()
-# 前往网站
-driver.get(url)
+from models import *
+from app import app
 
-print(find('//*[@id="rs_tb"]/tr[1]/td[1]/strong'))
+with app.app_context():
+    game = Game.query.filter_by(id=12123).all()
+    print(len(game))
