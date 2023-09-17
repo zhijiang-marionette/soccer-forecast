@@ -22,7 +22,7 @@ SQLALCHEMY_TRACK_MODIFICATIONS = True
 # 邮箱相关配置
 MAIL_SEVER = 'smtp.qq.com' # qq邮箱
 MAIL_PORT = 465
-MAIL_USERNAME = '962395743@qq.com'
-MAIL_PASSWORD = 'pharcwzskfqubcjf'
+MAIL_USERNAME = '1814286995@qq.com'
+MAIL_PASSWORD = 'nxabwzqzgkexcaha'
 MAIL_USE_TLS = False
 MAIL_USE_SSL = True
