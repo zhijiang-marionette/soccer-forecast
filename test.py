@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from time import sleep
 
 # def find(path):
 #     global driver
@@ -11,11 +12,12 @@ from selenium.webdriver.common.by import By
 # # 前往网站
 # driver.get(url)
 #
-# print(find('//*[@id="rs_tb"]/tr[1]/td[1]/strong'))
 
 from models import *
 from app import app
+import pandas as pd
 
 with app.app_context():
-    game = Game.query.filter_by(id=12123).all()
-    print(len(game))
+    games = Game.query.with_entities(Game.url).all()
+    df = pd.DataFrame(games)
+    df.to_excel('output.xlsx', index=False)

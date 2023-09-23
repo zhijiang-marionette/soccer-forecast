@@ -25,21 +25,21 @@ def find_game():
     except:
         dan = False
     # 比赛场次
-    session = find('/html/body/div[3]/div[6]/div[1]/div/div[3]/div[1]')
+    session = find('//*[@id="leagueMatch"]')
     # 比赛时间
-    game_time = datetime.strptime(find('/html/body/div[3]/div[6]/div[1]/div/div[3]/div[3]/span[2]') + ' ' + find(
-        '/html/body/div[3]/div[6]/div[1]/div/div[3]/div[3]/span[3]'), '%Y-%m-%d %H:%M:%S')
+    game_time = datetime.strptime(find('//*[@id="gameDate"]') + ' ' + find(
+        '//*[@id="gameTime"]'), '%Y-%m-%d %H:%M:%S')
     # 主队
-    host = find('/html/body/div[3]/div[6]/div[1]/div/div[3]/div[2]/div[2]').split(' ')[0]
+    host = find('//*[@id="teams"]').split(' ')[0]
     # 客队
-    guest = find('/html/body/div[3]/div[6]/div[1]/div/div[3]/div[2]/div[2]').split(' ')[2]
+    guest = find('//*[@id="teams"]').split(' ')[2]
 
     # 比赛结果
-    simple = find('/html/body/div[3]/div[6]/div[2]/table[1]/tbody/tr[1]/td[1]/strong')
-    rang = find('/html/body/div[3]/div[6]/div[2]/table[1]/tbody/tr[2]/td[1]/strong')
-    score = find('/html/body/div[3]/div[6]/div[2]/table[1]/tbody/tr[3]/td[1]/strong')
-    goals = int(find('/html/body/div[3]/div[6]/div[2]/table[1]/tbody/tr[4]/td[1]/strong')[0])
-    half = find('/html/body/div[3]/div[6]/div[2]/table[1]/tbody/tr[5]/td[1]/strong')
+    simple = find('//*[@id="rs_tb"]/tr[1]/td[1]/strong')
+    rang = find('//*[@id="rs_tb"]/tr[2]/td[1]/strong')
+    score = find('//*[@id="rs_tb"]/tr[3]/td[1]/strong')
+    goals = int(find('//*[@id="rs_tb"]/tr[4]/td[1]/strong')[0])
+    half = find('//*[@id="rs_tb"]/tr[5]/td[1]/strong')
 
     # 存储结果
     # 获取队伍id

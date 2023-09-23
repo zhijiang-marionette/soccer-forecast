@@ -4,10 +4,14 @@ from models import *
 import config
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from blueprints.forecast_blue import forecast_blue
 
 app = Flask(__name__)
 # 绑定配置文件
 app.config.from_object(config)
+
+# 注册蓝图
+app.register_blueprint(forecast_blue)
 
 # 先创建后绑定
 db.init_app(app)
