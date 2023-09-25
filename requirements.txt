@@ -1,6 +1,7 @@
 alembic==1.12.0
 blinker==1.6.2
 click==8.1.7
+et-xmlfile==1.1.0
 Flask==2.3.3
 Flask-Mail==0.9.1
 Flask-Migrate==4.0.5
@@ -11,8 +12,16 @@ itsdangerous==2.1.2
 Jinja2==3.1.2
 Mako==1.2.4
 MarkupSafe==2.1.3
+numpy==1.26.0
+openpyxl==3.1.2
+pandas==2.1.1
+PyMySQL==1.1.0
+python-dateutil==2.8.2
+pytz==2023.3.post1
 selenium==3.10.0
+six==1.16.0
 SQLAlchemy==2.0.20
 typing_extensions==4.7.1
+tzdata==2023.3
 Werkzeug==2.3.7
 zipp==3.16.2

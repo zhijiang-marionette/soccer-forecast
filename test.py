@@ -13,9 +13,9 @@ from time import sleep
 # driver.get(url)
 #
 
+import pandas as pd
 from models import *
 from app import app
-import pandas as pd
 
 with app.app_context():
     games = Game.query.with_entities(Game.url).all()
