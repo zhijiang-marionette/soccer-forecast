@@ -25,7 +25,7 @@ def find_game():
     except:
         dan = False
     # 比赛场次
-    session = find('//*[@id="leagueMatch"]')
+    session = find('//*[@id="gameDate"]') + ' '+ find('//*[@id="leagueMatch"]')
     # 比赛时间
     game_time = datetime.strptime(find('//*[@id="gameDate"]') + ' ' + find(
         '//*[@id="gameTime"]'), '%Y-%m-%d %H:%M:%S')
@@ -82,6 +82,7 @@ def find_game():
 # 获取胜平负信息
 def find_simple():
     i = 1
+    win_price, draw_price, lose_price = 0.1
     while find('//*[@id="had_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="had_tb"]/tr[' + str(i) + ']').split(' ')
         if arr[0] == '暂无数据':
@@ -99,11 +100,20 @@ def find_simple():
         # 3.将db.session中的改变同步到数据库中
         db.session.commit()
         i += 1
+    # 1.创建ORM对象
+    simple_final = Simple_final(game_id=game_id, win_price=win_price, draw_price=draw_price,
+                    lose_price=lose_price)
+    # 2.将ORM对象添加到db.session中
+    db.session.add(simple_final)
+    # 3.将db.session中的改变同步到数据库中
+    db.session.commit()
 
 
 # 获取让球胜平负信息
 def find_rang():
     i = 1
+    rangfou = ''
+    rang_win_price, rang_draw_price,  rang_lose_price = 0.1
     while find('//*[@id="hhad_tb"]/tr[' + str(i) + ']') != '':
         arr = find('//*[@id="hhad_tb"]/tr[' + str(i) + ']').split(' ')
         date_time = datetime.strptime(arr[0] + ' ' + arr[1], '%Y-%m-%d %H:%M:%S')
@@ -121,6 +131,13 @@ def find_rang():
         db.session.commit()
 
         i += 1
+    # 1.创建ORM对象
+    rang_final = Rang_final(rangfou=rangfou, game_id=game_id, rang_win_price=rang_win_price,
+                rang_draw_price=rang_draw_price, rang_lose_price=rang_lose_price)
+    # 2.将ORM对象添加到db.session中
+    db.session.add(rang_final)
+    # 3.将db.session中的改变同步到数据库中
+    db.session.commit()
 
 # 获取总进球数信息
 def find_goals():
