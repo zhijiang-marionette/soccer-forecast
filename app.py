@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from models import *
 # from blueprints.decision_manage import bp as dm_bp
 import config
@@ -26,7 +26,7 @@ migrate = Migrate(app, db)
 
 @app.route('/')
 def hello_world():
-    return 'Hello 中国!'
+    return render_template('index.html')
 
 @app.route('/add')
 def add():

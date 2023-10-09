@@ -7,7 +7,7 @@ import numpy as np
 forecast_blue = Blueprint('name', __name__)
 
 # 定义视图函数，配置蓝图路由
-@forecast_blue.route('/')
+@forecast_blue.route('/forecast')
 def home():
     return 1
 

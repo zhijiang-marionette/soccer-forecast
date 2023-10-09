@@ -36,6 +36,14 @@ class Simple(db.Model):
     draw_price = db.Column(db.Float)
     lose_price = db.Column(db.Float)
 
+class Simple_first(db.Model):
+    __tablename__ = 'simple_first'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    game_id = db.Column(db.Integer, nullable=False)  # 关联比赛id
+    win_price = db.Column(db.Float)
+    draw_price = db.Column(db.Float)
+    lose_price = db.Column(db.Float)
+
 class Simple_final(db.Model):
     __tablename__ = 'simple_final'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -51,6 +59,14 @@ class Rang(db.Model):
     rangfou = db.Column(db.String(255), nullable=False) # 让球还是受让
     game_id = db.Column(db.Integer, nullable=False)  # 关联比赛id
     date_time = db.Column(db.DateTime, nullable=False)  # 发布时间
+    rang_win_price = db.Column(db.Float, nullable=False)
+    rang_draw_price = db.Column(db.Float, nullable=False)
+    rang_lose_price = db.Column(db.Float, nullable=False)
+
+class Rang_first(db.Model):
+    __tablename__ = 'rang_first'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    game_id = db.Column(db.Integer, nullable=False)  # 关联比赛id
     rang_win_price = db.Column(db.Float, nullable=False)
     rang_draw_price = db.Column(db.Float, nullable=False)
     rang_lose_price = db.Column(db.Float, nullable=False)
@@ -79,39 +95,12 @@ class Goals(db.Model):
     six_price = db.Column(db.Float, nullable=False)
     seven_price = db.Column(db.Float, nullable=False)
 
-class Goals_final(db.Model):
-    __tablename__ = 'goals_final'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    game_id = db.Column(db.Integer, nullable=False)  # 关联比赛id
-    zero_price = db.Column(db.Float, nullable=False)
-    one_price = db.Column(db.Float, nullable=False)
-    two_price = db.Column(db.Float, nullable=False)
-    there_price = db.Column(db.Float, nullable=False)
-    four_price = db.Column(db.Float, nullable=False)
-    five_price = db.Column(db.Float, nullable=False)
-    six_price = db.Column(db.Float, nullable=False)
-    seven_price = db.Column(db.Float, nullable=False)
-
 # 半全场奖金信息
 class Half(db.Model):
     __tablename__ = 'half'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     game_id = db.Column(db.Integer, nullable=False)  # 关联比赛id
     date_time = db.Column(db.DateTime, nullable=False)  # 发布时间
-    win_win = db.Column(db.Float, nullable=False)
-    draw_win = db.Column(db.Float, nullable=False)
-    lose_win = db.Column(db.Float, nullable=False)
-    win_draw = db.Column(db.Float, nullable=False)
-    draw_draw = db.Column(db.Float, nullable=False)
-    lose_draw = db.Column(db.Float, nullable=False)
-    win_lose = db.Column(db.Float, nullable=False)
-    draw_lose = db.Column(db.Float, nullable=False)
-    lose_lose = db.Column(db.Float, nullable=False)
-
-class Half_final(db.Model):
-    __tablename__ = 'half_final'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    game_id = db.Column(db.Integer, nullable=False)  # 关联比赛id
     win_win = db.Column(db.Float, nullable=False)
     draw_win = db.Column(db.Float, nullable=False)
     lose_win = db.Column(db.Float, nullable=False)
