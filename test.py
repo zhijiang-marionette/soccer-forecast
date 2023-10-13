@@ -22,7 +22,7 @@ with app.app_context():
     arr_nx3 = np.array(simple_finals)
 
 # 创建1x3和3x3的numpy数组
-array_1x3 = np.array([3.55, 3.50, 1.75])
+array_1x3 = np.array([1.17, 5.35, 10.20])
 
 # 使用广播计算差值
 diff = arr_nx3 - array_1x3.reshape(1, -1)
@@ -73,8 +73,7 @@ with app.app_context():
     arr_nx3 = np.array(rang_finals)
 
 # 创建1x3和3x3的numpy数组
-array_1x3 = np.array([1.78, 3.70, 3.25])
-
+array_1x3 = np.array([2.92, 3.75, 1.89])
 # 使用广播计算差值
 diff = arr_nx3 - array_1x3.reshape(1, -1)
 

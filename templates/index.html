@@ -1,30 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>数据分析仪表板</title>
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <title>Awesome-pyecharts</title>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/echarts.js') }}"></script>
 </head>
-
 <body>
-    <!-- 导航栏 -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <h1>刘嘉敏</h1>
-    </nav>
-
-    <!-- 侧边栏 -->
-    <aside class="sidebar">
-        <!-- 侧边栏内容 -->
-    </aside>
-
-    <!-- 内容区 -->
-    <div class="content">
-        <!-- 内容区域 -->
-    </div>
-
-    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <div id="bar" style="width:1000px; height:600px;"></div>
+    <script>
+        $(
+            function () {
+                var chart = echarts.init(document.getElementById('bar'), 'white', {renderer: 'canvas'});
+                $.ajax({
+                    type: "GET",
+                    url: "http://127.0.0.1:5000/barChart",
+                    dataType: 'json',
+                    success: function (result) {
+                        chart.setOption(result);
+                    }
+                });
+            }
+        )
+    </script>
 </body>
-
 </html>
