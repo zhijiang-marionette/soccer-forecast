@@ -48,6 +48,7 @@ def get_results(matchId: int):
     # 客队
     guest = dict_data['value']['oddsHistory']['homeTeamAllName']
     # 单关
+    dan = False
     for item in dict_data['value']['oddsHistory']['singleList']:
         if item['poolCode'] == 'HAD':
             dan = False if item['single'] == 0 else True
@@ -96,7 +97,7 @@ def get_results(matchId: int):
         elif dic['code'] == 'CRS':
             score = dic['combinationDesc']
         elif dic['code'] == 'TTG':
-            goals = int(dic['combinationDesc'])
+            goals = int(dic['combinationDesc']) if dic['combinationDesc'] != '7+' else 7
 
     if simple == '':
         simple = '--'
@@ -242,6 +243,77 @@ def get_results(matchId: int):
 
 # -----------------------------返回历史奖金信息------------------------------------End
 
+# 处理胜平负奖金以及让球胜平负奖金的变化数据
+def data_change():
+    # 胜平负奖金
+    # 获取所有的记录
+    simple_first_entries = Simple_first.query.all()
+    simple_final_entries = Simple_final.query.all()
+
+    # 将Simple_final的数据以字典形式存储，以便后续匹配
+    simple_final_data = {entry.game_id: entry for entry in simple_final_entries}
+
+    i = 1
+
+    for entry1 in simple_first_entries:
+        game_id = entry1.game_id
+        if game_id in simple_final_data:
+            entry2 = simple_final_data[game_id]
+
+            result_field1 = entry2.win_price - entry1.win_price
+            result_field2 = entry2.draw_price - entry1.draw_price
+            result_field3 = entry2.lose_price - entry1.lose_price
+
+            result_entry = Simple_change(
+                game_id=game_id,
+                win_price=result_field1,
+                draw_price=result_field2,
+                lose_price=result_field3
+            )
+
+            db.session.add(result_entry)
+            db.session.commit()
+
+        i += 1
+        if i % 1000 == 0:
+            print('胜平负奖金处理已完成', i)
+
+    # 让球胜平负奖金
+    # 获取所有的记录
+    rang_first_entries = Rang_first.query.all()
+    rang_final_entries = Rang_final.query.all()
+
+    # 将Rang_final的数据以字典形式存储，以便后续匹配
+    rang_first_data = {entry.game_id: entry for entry in rang_first_entries}
+
+    i = 1
+
+    for entry1 in rang_final_entries:
+        game_id = entry1.game_id
+        if game_id in rang_first_data:
+            entry2 = rang_first_data[game_id]
+
+            result_field1 = entry1.rang_win_price - entry2.rang_win_price
+            result_field2 = entry1.rang_draw_price - entry2.rang_draw_price
+            result_field3 = entry1.rang_lose_price - entry2.rang_lose_price
+
+            result_entry = Rang_change(
+                game_id=game_id,
+                rang_win_price=result_field1,
+                rang_draw_price=result_field2,
+                rang_lose_price=result_field3
+            )
+
+            db.session.add(result_entry)
+            db.session.commit()
+
+        i += 1
+        if i % 1000 == 0:
+            print('已完成', i)
+
 with app.app_context():
-    for matchId in range(1021134, 1021405):
-        get_results(matchId)
+    # for matchId in range(1021405, 1021410):
+    #     get_results(matchId)
+    #     if matchId % 100 == 0:
+    #         print(matchId, '已完成')
+    data_change()

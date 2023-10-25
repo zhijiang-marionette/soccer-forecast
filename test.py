@@ -22,7 +22,7 @@ with app.app_context():
     arr_nx3 = np.array(simple_finals)
 
 # 创建1x3和3x3的numpy数组
-array_1x3 = np.array([1.85, 3.35, 3.35])
+array_1x3 = np.array([1.59, 3.72, 4.15])
 
 # 使用广播计算差值
 diff = arr_nx3 - array_1x3.reshape(1, -1)
@@ -73,7 +73,7 @@ with app.app_context():
     arr_nx3 = np.array(rang_finals)
 
 # 创建1x3和3x3的numpy数组
-array_1x3 = np.array([3.70, 3.60, 1.69])
+array_1x3 = np.array([2.76, 3.55, 2.02])
 # 让球情况
 rang = '-1'
 rangs = ['('+rang+')'+ ' ' +'胜', '('+rang+')'+ ' ' +'平', '('+rang+')'+ ' ' +'负']

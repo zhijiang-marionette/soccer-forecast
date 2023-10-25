@@ -52,6 +52,14 @@ class Simple_final(db.Model):
     draw_price = db.Column(db.Float)
     lose_price = db.Column(db.Float)
 
+class Simple_change(db.Model):
+    __tablename__ = 'simple_change'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    game_id = db.Column(db.Integer, nullable=False)  # 关联比赛id
+    win_price = db.Column(db.Float)
+    draw_price = db.Column(db.Float)
+    lose_price = db.Column(db.Float)
+
 # 让球胜平负信息
 class Rang(db.Model):
     __tablename__ = 'rang'
@@ -75,6 +83,14 @@ class Rang_final(db.Model):
     __tablename__ = 'rang_final'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     rangfou = db.Column(db.String(255), nullable=False)  # 让球还是受让
+    game_id = db.Column(db.Integer, nullable=False)  # 关联比赛id
+    rang_win_price = db.Column(db.Float, nullable=False)
+    rang_draw_price = db.Column(db.Float, nullable=False)
+    rang_lose_price = db.Column(db.Float, nullable=False)
+
+class Rang_change(db.Model):
+    __tablename__ = 'rang_change'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     game_id = db.Column(db.Integer, nullable=False)  # 关联比赛id
     rang_win_price = db.Column(db.Float, nullable=False)
     rang_draw_price = db.Column(db.Float, nullable=False)
