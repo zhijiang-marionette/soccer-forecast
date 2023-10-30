@@ -1,16 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Awesome-pyecharts</title>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/echarts.js') }}"></script>
-</head>
-<body>
-    <div id="bar" style="width:1000px; height:600px;"></div>
+{% extends 'base.html' %}
+
+{% block title %}
+首页
+{% endblock %}
+
+{% block body %}
+<div id="bar" style="width:1000px; height:600px;"></div>
+    <div id="pie" style="width:300px; height:200px;"></div>
     <div id="table-container">
-        <table id="dynamic-table">
-            <thead>
+        <table>
+            <thead id="game-list">
                 <tr>
                     <th>赛事编号</th>
                     <th>联赛</th>
@@ -19,26 +18,57 @@
                     <th>固定奖金分析</th>
                 </tr>
             </thead>
-        <tbody>
-          <!-- 数据将在此处动态添加 -->
-        </tbody>
       </table>
     </div>
 
     <script>
         $(
             function () {
-                var chart = echarts.init(document.getElementById('bar'), 'white', {renderer: 'canvas'});
+                var histogram = echarts.init(document.getElementById('bar'), 'white', {renderer: 'canvas'});
                 $.ajax({
                     type: "GET",
                     url: "http://127.0.0.1:5000/barChart",
                     dataType: 'json',
                     success: function (result) {
-                        chart.setOption(result);
+                        histogram.setOption(result);
+                    }
+                });
+
+                var pie = echarts.init(document.getElementById('pie'));
+                $.ajax({
+                    type: "GET",
+                    url: "http://127.0.0.1:5000/pieChart",
+                    dataType: 'json',
+                    success: function (result) {
+                        pie.setOption(result);
+                    }
+                });
+
+                $.ajax({
+                    type: "GET",
+                    url: "http://127.0.0.1:5000/get-game-list",
+                    dataType: 'json',
+                    success: function (result) {
+                        for (var i = 0; i < result.length; i++){
+                            var item = result[i];
+
+                            // 创建一个包含<th>的<tr>元素
+                            var trElement = $('<tr>');
+
+                            // 添加<th>元素到<tr>
+                            trElement.append('<th>' + item.matchNum + '</th>');
+                            trElement.append('<th>' + item.league + '</th>');
+                            trElement.append('<th>' + item.team + '</th>');
+                            trElement.append('<th>' + item.time + '</th>');
+                            trElement.append('<th>' + item.game_id + '</th>');
+
+                            // 将<tr>元素添加到<thread>中
+                            $('#game-list').append(trElement);
+
+                        }
                     }
                 });
             }
         )
     </script>
-</body>
-</html>
+{% endblock %}

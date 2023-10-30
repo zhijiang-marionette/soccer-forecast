@@ -2,7 +2,6 @@ import requests
 import json
 from models import *
 from datetime import datetime
-from app import app
 
 # 爬取竞彩网开的赛事，并汇总成列表
 def get_game_list() -> list:
@@ -20,7 +19,7 @@ def get_game_list() -> list:
         for dic in item['subMatchList']:
             game = dict(matchNum=dic['matchNum'], league=dic['leagueAllName'],
                         team=dic['homeTeamAllName'] + 'vs' + dic['awayTeamAllName'],
-                        time=dic['matchDate'] + dic['matchTime'], game_id=dic['matchId'])
+                        time=dic['matchDate'] + ' ' + dic['matchTime'], game_id=dic['matchId'])
             res.append(game)
 
     return res
@@ -283,13 +282,20 @@ def data_change():
     rang_first_entries = Rang_first.query.all()
     rang_final_entries = Rang_final.query.all()
 
-    # 将Rang_final的数据以字典形式存储，以便后续匹配
+    # 将rang_final的数据以字典形式存储，以便后续匹配
     rang_first_data = {entry.game_id: entry for entry in rang_first_entries}
+
+    # 获取rang_change所有数据
+    rang_change_entries = Rang_change.query.all()
+    # 将rang_change的数据以字典形式存储，以便跳过循环
+    rang_change_data = {entry.game_id: entry for entry in rang_change_entries}
 
     i = 1
 
     for entry1 in rang_final_entries:
         game_id = entry1.game_id
+        if game_id in rang_change_data:
+            continue
         if game_id in rang_first_data:
             entry2 = rang_first_data[game_id]
 
@@ -311,9 +317,9 @@ def data_change():
         if i % 1000 == 0:
             print('已完成', i)
 
-with app.app_context():
-    # for matchId in range(1021405, 1021410):
-    #     get_results(matchId)
-    #     if matchId % 100 == 0:
-    #         print(matchId, '已完成')
-    data_change()
+# with app.app_context():
+#     # for matchId in range(1021405, 1021410):
+#     #     get_results(matchId)
+#     #     if matchId % 100 == 0:
+#     #         print(matchId, '已完成')
+#     print(get_game_list())

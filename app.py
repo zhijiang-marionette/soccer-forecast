@@ -6,8 +6,11 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from blueprints.forecast_blue import forecast_blue
 from pyecharts import options as opts
-from pyecharts.charts import Bar
+from pyecharts.charts import Bar, Pie
 from random import randrange
+from calculate import probability_of_simple
+from crawler import get_game_list
+import json
 
 app = Flask(__name__)
 # 绑定配置文件
@@ -37,6 +40,17 @@ def bar_base() -> Bar:
     )
     return c
 
+def pie_base(data: list) -> Pie:
+    p = (
+        Pie()
+        .add('', data,
+             )
+        .set_global_opts(title_opts=opts.TitleOpts(title="胜平负比例图"))
+        .set_global_opts(legend_opts=opts.LegendOpts(is_show=False))  # 不显示图示
+    )
+
+    return p
+
 @app.route('/')
 def hello_world():
     return render_template('index.html')
@@ -46,16 +60,16 @@ def get_bar_chart():
     c = bar_base()
     return c.dump_options_with_quotes()
 
-@app.route('/add')
-def add():
-    # 1.创建ORM对象
-    team = Team(name='曼城')
-    # 2.将ORM对象添加到db.session中
-    db.session.add(team)
-    # 3.将db.session中的改变同步到数据库中
-    db.session.commit()
+@app.route("/pieChart")
+def get_pie_chart():
+    data = probability_of_simple(1.25, 4.50, 8.50)
 
-    return "对象添加成功"
+    p = pie_base(data)
+    return p.dump_options_with_quotes()
+
+@app.route('/get-game-list')
+def game_list():
+    return json.dumps(get_game_list())
 
 if __name__ == '__main__':
     app.run(debug=True)
