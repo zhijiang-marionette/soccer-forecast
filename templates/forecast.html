@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}
+首页
+{% endblock %}
+
+{% block body %}
+<!--    <div id="bar" style="width:1000px; height:600px;"></div>-->
+<div class="row row-deck row-cards">
+    <div class="col-md-3 rounded"style="height:300px;">
+        <div class="card">
+            <div class="card-body" id="simplePie">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 rounded" style="height:300px;">
+        <div class="card">
+            <div class="card-body" id="rangPie">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 rounded" style="height:300px;">
+        <div class="card">
+            <div class="card-body" id="simpleChangePie">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 rounded" style="height:300px;">
+        <div class="card">
+            <div class="card-body" id="rangChangePie">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 bg-dark" id="gameList" style="height:400px;"></div>
+    <div class="col-md-6 bg-primary" id="scores" style="height:400px;"></div>
+</div>
+
+    <script>
+        $(
+            function () {
+// <!--                var histogram = echarts.init(document.getElementById('bar'), 'white', {renderer: 'canvas'});-->
+// <!--                $.ajax({-->
+// <!--                    type: "GET",-->
+// <!--                    url: "http://127.0.0.1:5000/barChart",-->
+// <!--                    dataType: 'json',-->
+// <!--                    success: function (result) {-->
+// <!--                        histogram.setOption(result);-->
+// <!--                    }-->
+// <!--                });-->
+
+                var simplePie = echarts.init(document.getElementById('simplePie'));
+                $.ajax({
+                    type: "GET",
+                    url: "http://127.0.0.1:5000/forecast/simplePie",
+                    data: {matchId: 1021894},
+                    dataType: 'json',
+                    success: function (result) {
+                        simplePie.setOption(result);
+                    }
+                });
+
+                var rangPie = echarts.init(document.getElementById('rangPie'));
+                $.ajax({
+                    type: "GET",
+                    url: "http://127.0.0.1:5000/forecast/rangPie",
+                    data: {matchId: 1021894},
+                    dataType: 'json',
+                    success: function (result) {
+                        rangPie.setOption(result);
+                    }
+                });
+
+                var simpleChangePie = echarts.init(document.getElementById('simpleChangePie'));
+                $.ajax({
+                    type: "GET",
+                    url: "http://127.0.0.1:5000/forecast/simpleChangePie",
+                    data: {matchId: 1021894},
+                    dataType: 'json',
+                    success: function (result) {
+                        simpleChangePie.setOption(result);
+                    }
+                });
+
+                var rangChangePie = echarts.init(document.getElementById('rangChangePie'));
+                $.ajax({
+                    type: "GET",
+                    url: "http://127.0.0.1:5000/forecast/rangChangePie",
+                    data: {matchId: 1021894},
+                    dataType: 'json',
+                    success: function (result) {
+                        rangChangePie.setOption(result);
+                    }
+                });
+            }
+        )
+    </script>
+{% endblock %}

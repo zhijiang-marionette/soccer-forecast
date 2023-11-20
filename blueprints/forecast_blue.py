@@ -1,113 +1,157 @@
-from flask import Blueprint
+from flask import Blueprint, render_template, request
 from exts import db
 from models import *
 import numpy as np
+from pyecharts import options as opts
+from pyecharts.charts import Bar, Pie
+from random import randrange
+from calculate import *
+import requests
+import json
 
 # 创建蓝图模版
 forecast_blue = Blueprint('name', __name__)
 
+
 # 定义视图函数，配置蓝图路由
-@forecast_blue.route('/forecast')
+@forecast_blue.route('/')
 def home():
-    return 1
+    return render_template('forecast.html')
 
-# 根据欧几里得距离计算，计算出截止时间的赔率相似比赛，得出三种结果可能性
-@forecast_blue.route('/simple-final', methods=['POST'])
-def simple_final():
-    # 导出数据库中所有截止时间的赔率
-    simple_finals = Simple_final.query.with_entities(Simple_final.win_price, Simple_final.draw_price,
-                                                     Simple_final.lose_price).all()
-    arr_nx3 = np.array(simple_finals)
 
-    # 创建1x3和3x3的numpy数组
-    array_1x3 = np.array([1.96, 3.42, 2.97])
+def bar_base() -> Bar:
+    c = (
+        Bar()
+        .add_xaxis(["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"])
+        .add_yaxis("商家A", [randrange(0, 100) for _ in range(6)])
+        .add_yaxis("商家B", [randrange(0, 100) for _ in range(6)])
+        .set_global_opts(title_opts=opts.TitleOpts(title="Bar-基本示例", subtitle="我是副标题"))
+    )
+    return c
 
-    # 使用广播计算差值
-    diff = arr_nx3 - array_1x3.reshape(1, -1)
 
-    # 计算每个元素的平方
-    squared_diff = diff ** 2
+def simple_pie(data: list) -> Pie:
+    p = (
+        Pie()
+        .add('', data,
+             )
+        # .set_global_opts(title_opts=opts.TitleOpts(title="胜平负比例图"))
+        # .set_global_opts(legend_opts=opts.LegendOpts(is_show=False))  # 不显示图示
+    )
 
-    # 沿着第一个轴（axis=1）求和
-    sum_squared_diff = np.sum(squared_diff, axis=1)
+    return p
 
-    # 对结果开根号，得到欧几里得距离
-    euclidean_distance = np.sqrt(sum_squared_diff)
 
-    # 找到这些元素的索引, 取得是每一个奖金差距在0.04以内
-    indices_below_threshold = np.where(euclidean_distance < 0.0692)[0] + 1
+def rang_pie(data: list) -> Pie:
+    p = (
+        Pie()
+        .add('', data,
+             )
+        # .set_global_opts(title_opts=opts.TitleOpts(title="让胜平负比例图"))
+        # .set_global_opts(legend_opts=opts.LegendOpts(is_show=False))  # 不显示图示
+    )
 
-    # 根据索引在数据库中检索
-    games = Game.query.filter(Game.id.in_(indices_below_threshold)).all()
+    return p
 
-    # 得到比赛结果列表
-    simples = [game.simple for game in games]
 
-    # 计算三种结果比例
-    total_matches = len(simples)
-    win_count = simples.count('胜')
-    draw_count = simples.count('平')
-    loss_count = simples.count('负')
+@forecast_blue.route("/barChart")
+def get_bar_chart():
+    c = bar_base()
+    return c.dump_options_with_quotes()
 
-    win_percentage = (win_count / total_matches) * 100
-    draw_percentage = (draw_count / total_matches) * 100
-    loss_percentage = (loss_count / total_matches) * 100
 
-    print(f'胜利比例：{win_percentage:.2f}%')
-    print(f'平局比例：{draw_percentage:.2f}%')
-    print(f'失败比例：{loss_percentage:.2f}%')
+@forecast_blue.route("/simplePie", methods=['GET'])
+def get_simple_pie():
+    # 获取参数
+    matchId = request.args.get('matchId')
+    # 发送请求获取网页内容
+    url = 'https://webapi.sporttery.cn/gateway/jc/football/getFixedBonusV1.qry?clientCode=3001&matchId=' + str(matchId)
+    response = requests.get(url)
+    html = response.content
 
-# 根据欧几里得距离计算，计算出截止时间的赔率相似比赛，得出三种结果可能性（让球）
-@forecast_blue.route('/rang-final', methods=['POST'])
-def rang_final():
-    # 导出数据库中所有截止时间的赔率
-    rang_finals = Rang_final.query.with_entities(Rang_final.rang_win_price, Rang_final.rang_draw_price,
-                                                     Rang_final.rang_lose_price).all()
-    arr_nx3 = np.array(rang_finals)
+    # 解析返回内容，转换为字典格式
+    dict_data = json.loads(html)
 
-    # 创建1x3和3x3的numpy数组
-    array_1x3 = np.array([1.96, 3.42, 2.97])
+    # 提取奖金信息
+    win_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['h'])
+    draw_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['d'])
+    lose_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['a'])
 
-    # 使用广播计算差值
-    diff = arr_nx3 - array_1x3.reshape(1, -1)
+    data = probability_of_simple(win_price, draw_price, lose_price)
 
-    # 计算每个元素的平方
-    squared_diff = diff ** 2
+    p = simple_pie(data)
+    return p.dump_options_with_quotes()
 
-    # 沿着第一个轴（axis=1）求和
-    sum_squared_diff = np.sum(squared_diff, axis=1)
 
-    # 对结果开根号，得到欧几里得距离
-    euclidean_distance = np.sqrt(sum_squared_diff)
+@forecast_blue.route("/rangPie", methods=['GET'])
+def get_rang_pie():
+    # 获取参数
+    matchId = request.args.get('matchId')
+    # 发送请求获取网页内容
+    url = 'https://webapi.sporttery.cn/gateway/jc/football/getFixedBonusV1.qry?clientCode=3001&matchId=' + str(matchId)
+    response = requests.get(url)
+    html = response.content
 
-    # 找到这些元素的索引, 取得是每一个奖金差距在0.04以内
-    indices_below_threshold = np.where(euclidean_distance < 0.0692)[0] + 1
+    # 解析返回内容，转换为字典格式
+    dict_data = json.loads(html)
 
-    # 根据索引在数据库中检索
-    games = Game.query.filter(Game.id.in_(indices_below_threshold)).all()
+    # 提取奖金信息
+    rang_win_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['h'])
+    rang_draw_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['d'])
+    rang_lose_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['a'])
 
-    # 得到比赛结果列表
-    rangs = [game.rang for game in games]
+    data = probability_of_rang(rang_win_price, rang_draw_price, rang_lose_price)
 
-    # 简单处理
-    for i in range(len(rangs)):
-        if rangs[i][-1] == '胜':
-            rangs[i][-1] = '让胜'
-        elif rangs[i][-1] == '平':
-            rangs[i][-1] = '让平'
-        else:
-            rangs[i][-1] = '让负'
+    p = rang_pie(data)
+    return p.dump_options_with_quotes()
 
-    # 计算三种结果比例
-    total_matches = len(rangs)
-    rang_win_count = rangs.count('让胜')
-    rang_draw_count = rangs.count('让平')
-    rang_loss_count = rangs.count('让负')
 
-    rang_win_percentage = (rang_win_count / total_matches) * 100
-    rang_draw_percentage = (rang_draw_count / total_matches) * 100
-    rang_loss_percentage = (rang_loss_count / total_matches) * 100
+@forecast_blue.route("/simpleChangePie", methods=['GET'])
+def get_simple_change_pie():
+    # 获取参数
+    matchId = request.args.get('matchId')
+    # 发送请求获取网页内容
+    url = 'https://webapi.sporttery.cn/gateway/jc/football/getFixedBonusV1.qry?clientCode=3001&matchId=' + str(matchId)
+    response = requests.get(url)
+    html = response.content
 
-    print(f'让胜比例：{rang_win_percentage:.2f}%')
-    print(f'让平比例：{rang_draw_percentage:.2f}%')
-    print(f'让负比例：{rang_loss_percentage:.2f}%')
+    # 解析返回内容，转换为字典格式
+    dict_data = json.loads(html)
+
+    # 提取奖金信息
+    win_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['h']) - float(
+        dict_data['value']['oddsHistory']['hadList'][0]['h'])
+    draw_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['d']) - float(
+        dict_data['value']['oddsHistory']['hadList'][0]['d'])
+    lose_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['a']) - float(
+        dict_data['value']['oddsHistory']['hadList'][0]['a'])
+
+    data = probability_of_simpleChange(win_price, draw_price, lose_price)
+
+    p = simple_pie(data)
+    return p.dump_options_with_quotes()
+
+@forecast_blue.route("/rangChangePie", methods=['GET'])
+def get_rang_change_pie():
+    # 获取参数
+    matchId = request.args.get('matchId')
+    # 发送请求获取网页内容
+    url = 'https://webapi.sporttery.cn/gateway/jc/football/getFixedBonusV1.qry?clientCode=3001&matchId=' + str(matchId)
+    response = requests.get(url)
+    html = response.content
+
+    # 解析返回内容，转换为字典格式
+    dict_data = json.loads(html)
+
+    # 提取奖金信息
+    rang_win_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['h']) - float(
+        dict_data['value']['oddsHistory']['hhadList'][0]['h'])
+    rang_draw_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['d']) - float(
+        dict_data['value']['oddsHistory']['hhadList'][0]['d'])
+    rang_lose_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['a']) - float(
+        dict_data['value']['oddsHistory']['hhadList'][0]['a'])
+
+    data = probability_of_rangChange(rang_win_price, rang_draw_price, rang_lose_price)
+
+    p = rang_pie(data)
+    return p.dump_options_with_quotes()

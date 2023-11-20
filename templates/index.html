@@ -5,8 +5,12 @@
 {% endblock %}
 
 {% block body %}
-<div id="bar" style="width:1000px; height:600px;"></div>
-    <div id="pie" style="width:300px; height:200px;"></div>
+<!--    <div id="bar" style="width:1000px; height:600px;"></div>-->
+<div class="row">
+    <div class="col-md-3 bg-white rounded" id="simplePie" style="height:300px;"></div>
+    <div class="col-md-3 bg-white rounded" id="rangPie" style="height:300px;"></div>
+    <div class="col-md-3 bg-white rounded" id="1" style="height:300px;"></div>
+</div>
     <div id="table-container">
         <table>
             <thead id="game-list">
@@ -24,23 +28,33 @@
     <script>
         $(
             function () {
-                var histogram = echarts.init(document.getElementById('bar'), 'white', {renderer: 'canvas'});
+// <!--                var histogram = echarts.init(document.getElementById('bar'), 'white', {renderer: 'canvas'});-->
+// <!--                $.ajax({-->
+// <!--                    type: "GET",-->
+// <!--                    url: "http://127.0.0.1:5000/barChart",-->
+// <!--                    dataType: 'json',-->
+// <!--                    success: function (result) {-->
+// <!--                        histogram.setOption(result);-->
+// <!--                    }-->
+// <!--                });-->
+
+                var simplePie = echarts.init(document.getElementById('simplePie'));
                 $.ajax({
                     type: "GET",
-                    url: "http://127.0.0.1:5000/barChart",
+                    url: "http://127.0.0.1:5000/simplePie",
                     dataType: 'json',
                     success: function (result) {
-                        histogram.setOption(result);
+                        simplePie.setOption(result);
                     }
                 });
 
-                var pie = echarts.init(document.getElementById('pie'));
+                var rangPie = echarts.init(document.getElementById('rangPie'));
                 $.ajax({
                     type: "GET",
-                    url: "http://127.0.0.1:5000/pieChart",
+                    url: "http://127.0.0.1:5000/rangPie",
                     dataType: 'json',
                     success: function (result) {
-                        pie.setOption(result);
+                        rangPie.setOption(result);
                     }
                 });
 
