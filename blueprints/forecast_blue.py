@@ -12,10 +12,13 @@ import json
 # 创建蓝图模版
 forecast_blue = Blueprint('name', __name__)
 
+matchId = 0
 
 # 定义视图函数，配置蓝图路由
-@forecast_blue.route('/')
-def home():
+@forecast_blue.route('/<Id>')
+def home(Id):
+    global matchId
+    matchId = Id
     return render_template('forecast.html')
 
 
@@ -62,8 +65,6 @@ def get_bar_chart():
 
 @forecast_blue.route("/simplePie", methods=['GET'])
 def get_simple_pie():
-    # 获取参数
-    matchId = request.args.get('matchId')
     # 发送请求获取网页内容
     url = 'https://webapi.sporttery.cn/gateway/jc/football/getFixedBonusV1.qry?clientCode=3001&matchId=' + str(matchId)
     response = requests.get(url)
@@ -85,8 +86,6 @@ def get_simple_pie():
 
 @forecast_blue.route("/rangPie", methods=['GET'])
 def get_rang_pie():
-    # 获取参数
-    matchId = request.args.get('matchId')
     # 发送请求获取网页内容
     url = 'https://webapi.sporttery.cn/gateway/jc/football/getFixedBonusV1.qry?clientCode=3001&matchId=' + str(matchId)
     response = requests.get(url)
@@ -108,8 +107,6 @@ def get_rang_pie():
 
 @forecast_blue.route("/simpleChangePie", methods=['GET'])
 def get_simple_change_pie():
-    # 获取参数
-    matchId = request.args.get('matchId')
     # 发送请求获取网页内容
     url = 'https://webapi.sporttery.cn/gateway/jc/football/getFixedBonusV1.qry?clientCode=3001&matchId=' + str(matchId)
     response = requests.get(url)
@@ -133,8 +130,6 @@ def get_simple_change_pie():
 
 @forecast_blue.route("/rangChangePie", methods=['GET'])
 def get_rang_change_pie():
-    # 获取参数
-    matchId = request.args.get('matchId')
     # 发送请求获取网页内容
     url = 'https://webapi.sporttery.cn/gateway/jc/football/getFixedBonusV1.qry?clientCode=3001&matchId=' + str(matchId)
     response = requests.get(url)

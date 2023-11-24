@@ -74,7 +74,7 @@
                             trElement.append('<th>' + item.league + '</th>');
                             trElement.append('<th>' + item.team + '</th>');
                             trElement.append('<th>' + item.time + '</th>');
-                            trElement.append('<th>' + item.game_id + '</th>');
+                            trElement.append('<th>' + '<a href="http://127.0.0.1:5000/forecast/' + item.game_id + '">' + item.game_id + '</a>' + '</th>');
 
                             // 将<tr>元素添加到<thread>中
                             $('#game-list').append(trElement);
