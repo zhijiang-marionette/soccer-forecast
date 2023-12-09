@@ -1,7 +1,7 @@
 import numpy as np
 from models import *
 
-def probability_of_simple(win: float, draw: float, lose: float) -> list:
+def probability_of_simple(win: float, draw: float, lose: float):
     simple_finals = Simple_final.query.with_entities(Simple_final.win_price, Simple_final.draw_price,
                                                      Simple_final.lose_price).all()
     arr_nx3 = np.array(simple_finals)
@@ -42,9 +42,9 @@ def probability_of_simple(win: float, draw: float, lose: float) -> list:
 
     return [['胜利', win_percentage],
             ['平局', draw_percentage],
-            ['失败', lose_percentage]]
+            ['失败', lose_percentage]], games
 
-def probability_of_rang(rang_win: float, rang_draw: float, rang_lose: float) -> list:
+def probability_of_rang(rang_win: float, rang_draw: float, rang_lose: float):
     # 导出数据库中所有截止时间的赔率
     rang_finals = Rang_final.query.with_entities(Rang_final.rang_win_price, Rang_final.rang_draw_price,
                                                      Rang_final.rang_lose_price).all()
@@ -99,9 +99,9 @@ def probability_of_rang(rang_win: float, rang_draw: float, rang_lose: float) -> 
 
     return [['让胜', rang_win_percentage],
             ['让平', rang_draw_percentage],
-            ['让负', rang_lose_percentage]]
+            ['让负', rang_lose_percentage]], games
 
-def probability_of_simpleChange(win: float, draw: float, lose: float) -> list:
+def probability_of_simpleChange(win: float, draw: float, lose: float):
     simple_changes = Simple_change.query.with_entities(Simple_change.win_price, Simple_change.draw_price,
                                                      Simple_change.lose_price).all()
     arr_nx3 = np.array(simple_changes)
@@ -142,9 +142,9 @@ def probability_of_simpleChange(win: float, draw: float, lose: float) -> list:
 
     return [['胜利', win_percentage],
             ['平局', draw_percentage],
-            ['失败', lose_percentage]]
+            ['失败', lose_percentage]], games
 
-def probability_of_rangChange(rang_win: float, rang_draw: float, rang_lose: float) -> list:
+def probability_of_rangChange(rang_win: float, rang_draw: float, rang_lose: float):
     # 导出数据库中所有截止时间的赔率
     rang_finals = Rang_change.query.with_entities(Rang_change.rang_win_price, Rang_change.rang_draw_price,
                                                      Rang_change.rang_lose_price).all()
@@ -199,4 +199,4 @@ def probability_of_rangChange(rang_win: float, rang_draw: float, rang_lose: floa
 
     return [['让胜', rang_win_percentage],
             ['让平', rang_draw_percentage],
-            ['让负', rang_lose_percentage]]
+            ['让负', rang_lose_percentage]], games

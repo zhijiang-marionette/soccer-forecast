@@ -35,8 +35,24 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6 bg-dark" id="gameList" style="height:400px;"></div>
-    <div class="col-md-6 bg-primary" id="scores" style="height:400px;"></div>
+    <div class="col-md-2 bg-dark rounded" id="gameList" style="height:400px;">
+        <div class="card text-center">
+            <p>胜平负分析</p>
+            <p>让球分析</p>
+        </div>
+    </div>
+    <div class="col-md-5 rounded" style="height:400px;">
+        <div class="card text-center">
+            <div class="card-body" id="simpleLine">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-5 rounded" style="height:400px;">
+        <div class="card text-center">
+            <div class="card-body" id="rangLine">
+            </div>
+        </div>
+    </div>
 </div>
 
     <script>
@@ -89,6 +105,26 @@
                     dataType: 'json',
                     success: function (result) {
                         rangChangePie.setOption(result);
+                    }
+                });
+
+                var simpleLine = echarts.init(document.getElementById('simpleLine'));
+                $.ajax({
+                    type: "GET",
+                    url: "http://127.0.0.1:5000/forecast/simpleLine",
+                    dataType: 'json',
+                    success: function (result) {
+                        simpleLine.setOption(result);
+                    }
+                });
+
+                var rangLine = echarts.init(document.getElementById('rangLine'));
+                $.ajax({
+                    type: "GET",
+                    url: "http://127.0.0.1:5000/forecast/rangLine",
+                    dataType: 'json',
+                    success: function (result) {
+                        rangLine.setOption(result);
                     }
                 });
             }
