@@ -69,14 +69,16 @@
 // <!--                });-->
 
                 var simplePie = echarts.init(document.getElementById('simplePie'));
-                $.ajax({
-                    type: "GET",
-                    url: "http://127.0.0.1:5000/forecast/simplePie",
-                    dataType: 'json',
-                    success: function (result) {
-                        simplePie.setOption(result);
-                    }
-                });
+                console.log({{ context.simplePie }});
+                simplePie.setOption({{ context.simplePie }});
+<!--                $.ajax({-->
+<!--                    type: "GET",-->
+<!--                    url: "http://127.0.0.1:5000/forecast/simplePie",-->
+<!--                    dataType: 'json',-->
+<!--                    success: function (result) {-->
+<!--                        simplePie.setOption(result);-->
+<!--                    }-->
+<!--                });-->
 
                 var rangPie = echarts.init(document.getElementById('rangPie'));
                 $.ajax({
@@ -125,8 +127,21 @@
                     dataType: 'json',
                     success: function (result) {
                         rangLine.setOption(result);
+                        console.log(result);
                     }
                 });
+
+<!--                var rangLine = echarts.init(document.getElementById('rangLine'));-->
+                $.ajax({
+                    type: "GET",
+                    url: "http://127.0.0.1:5000/forecast/similarGames",
+                    dataType: 'json',
+                    success: function (result) {
+                        rangLine.setOption(result);
+                    }
+                });
+
+                console.log(context.simplePie);
             }
         )
     </script>

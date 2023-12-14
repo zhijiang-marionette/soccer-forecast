@@ -23,10 +23,11 @@ simple_result = [0, 0, 0]
 rang_result = [0, 0, 0]
 
 # 定义视图函数，配置蓝图路由
-@forecast_blue.route('/<Id>')
+@forecast_blue.route('/<Id>', methods=['GET'])
 def home(Id):
-    global matchId, dict_data
+    global matchId, dict_data, similar_games
     matchId = Id
+    context = {}
     # 发送请求获取网页内容
     url = 'https://webapi.sporttery.cn/gateway/jc/football/getFixedBonusV1.qry?clientCode=3001&matchId=' + str(matchId)
     response = requests.get(url)
@@ -34,7 +35,49 @@ def home(Id):
 
     # 解析返回内容，转换为字典格式
     dict_data = json.loads(html)
-    return render_template('forecast.html')
+
+    # -----------------------------------------胜平负奖金相似比赛-----------------------------------------
+    # 提取奖金信息
+    win_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['h'])
+    draw_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['d'])
+    lose_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['a'])
+
+    data, games = probability_of_simple(win_price, draw_price, lose_price)
+
+    for i in range(len(data)):
+        simple_result[0] += data[0][1] * 0.4
+
+    similar_games.update(games)
+
+    sp = (
+        Pie()
+        .add('', data,
+             )
+    )
+
+    context['simplePie'] = sp
+    #
+    # # ---------------------------------------让球胜平负奖金相似比赛---------------------------------------
+    # # 提取奖金信息
+    # rang_win_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['h'])
+    # rang_draw_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['d'])
+    # rang_lose_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['a'])
+    #
+    # data, games = probability_of_rang(rang_win_price, rang_draw_price, rang_lose_price)
+    #
+    # for i in range(len(data)):
+    #     rang_result[0] += data[0][1] * 0.4
+    #
+    # similar_games.update(games)
+    #
+    # rp = (
+    #     Pie()
+    #     .add('', data,
+    #          )
+    # )
+    #
+    # context['rangPie'] = rp
+    return render_template('forecast.html', context=context)
 
 @forecast_blue.route("/simplePie", methods=['GET'])
 def get_simple_pie():
