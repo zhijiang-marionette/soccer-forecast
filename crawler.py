@@ -2,6 +2,7 @@ import requests
 import json
 from models import *
 from datetime import datetime
+# from app import app
 
 # 爬取竞彩网开的赛事，并汇总成列表
 def get_game_list() -> list:
@@ -45,7 +46,7 @@ def get_results(matchId: int):
     # 主队
     host = dict_data['value']['oddsHistory']['homeTeamAllName']
     # 客队
-    guest = dict_data['value']['oddsHistory']['homeTeamAllName']
+    guest = dict_data['value']['oddsHistory']['awayTeamAllName']
     # 单关
     dan = False
     for item in dict_data['value']['oddsHistory']['singleList']:
@@ -318,8 +319,28 @@ def data_change():
             print('已完成', i)
 
 # with app.app_context():
-#     # for matchId in range(1021405, 1021410):
-#     #     get_results(matchId)
-#     #     if matchId % 100 == 0:
-#     #         print(matchId, '已完成')
-#     print(get_game_list())
+#     for matchId in range(1021134, 1023104):
+#         get_results(matchId)
+#         if matchId % 100 == 0:
+#             print(matchId, '已完成')
+    # print(get_game_list())
+
+# 删除错误比赛记录
+# with app.app_context():
+#     for i in range(36391, 50000):
+#         record = db.session.query(Game).filter(Game.id == i)
+#         if record is not None:
+#             record.delete()
+#             db.session.query(Goals).filter(Goals.game_id == i).delete()
+#             db.session.query(Half).filter(Half.game_id == i).delete()
+#             db.session.query(Rang).filter(Rang.game_id == i).delete()
+#             db.session.query(Rang_change).filter(Rang_change.game_id == i).delete()
+#             db.session.query(Rang_final).filter(Rang_final.game_id == i).delete()
+#             db.session.query(Rang_first).filter(Rang_first.game_id == i).delete()
+#             db.session.query(Simple).filter(Simple.game_id == i).delete()
+#             db.session.query(Simple_change).filter(Simple_change.game_id == i).delete()
+#             db.session.query(Simple_final).filter(Simple_final.game_id == i).delete()
+#             db.session.query(Simple_first).filter(Simple_first.game_id == i).delete()
+#             db.session.commit()
+#         else:
+#             break

@@ -5,9 +5,11 @@
     <title>{% block title %}{% endblock %}</title>
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/echarts.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-table.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tabler.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-table.css') }}">
     {% block head %}{% endblock %}
 </head>
 <body style="background-color: #f4f6fa">

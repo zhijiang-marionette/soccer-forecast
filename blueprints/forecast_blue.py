@@ -16,18 +16,18 @@ forecast_blue = Blueprint('name', __name__)
 matchId = 0
 # 存储爬取奖金返回信息
 dict_data = {}
-# 奖金信息和盘口变化相似的比赛，运用集合进行存储，避免重复项
-similar_games = set()
-# 奖金信息和盘口变化相似比赛的结果概率情况，分胜平负和让球两个概率
-simple_result = [0, 0, 0]
-rang_result = [0, 0, 0]
 
 # 定义视图函数，配置蓝图路由
 @forecast_blue.route('/<Id>', methods=['GET'])
 def home(Id):
-    global matchId, dict_data, similar_games
+    global matchId, dict_data
+    # 奖金信息和盘口变化相似的比赛
+    similar_games = []
+    # 奖金信息和盘口变化相似比赛的结果概率情况，分胜平负和让球两个概率
+    simple_result = [0, 0, 0]
+    rang_result = [0, 0, 0]
     matchId = Id
-    context = {}
+
     # 发送请求获取网页内容
     url = 'https://webapi.sporttery.cn/gateway/jc/football/getFixedBonusV1.qry?clientCode=3001&matchId=' + str(matchId)
     response = requests.get(url)
@@ -44,67 +44,23 @@ def home(Id):
 
     data, games = probability_of_simple(win_price, draw_price, lose_price)
 
-    for i in range(len(data)):
-        simple_result[0] += data[0][1] * 0.4
+    sorted_games = sorted(games, key = lambda game: game.game_time, reverse=True)
 
-    similar_games.update(games)
+    if len(sorted_games) > 20:
+        sorted_games = sorted_games[0:20]
+
+    for i in range(len(data)):
+        simple_result[i] += data[i][1] * 0.4
+
+    # similar_games.update(sorted_games)
 
     sp = (
         Pie()
         .add('', data,
              )
-    )
+    ).dump_options_with_quotes()
 
-    context['simplePie'] = sp
-    #
-    # # ---------------------------------------让球胜平负奖金相似比赛---------------------------------------
-    # # 提取奖金信息
-    # rang_win_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['h'])
-    # rang_draw_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['d'])
-    # rang_lose_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['a'])
-    #
-    # data, games = probability_of_rang(rang_win_price, rang_draw_price, rang_lose_price)
-    #
-    # for i in range(len(data)):
-    #     rang_result[0] += data[0][1] * 0.4
-    #
-    # similar_games.update(games)
-    #
-    # rp = (
-    #     Pie()
-    #     .add('', data,
-    #          )
-    # )
-    #
-    # context['rangPie'] = rp
-    return render_template('forecast.html', context=context)
-
-@forecast_blue.route("/simplePie", methods=['GET'])
-def get_simple_pie():
-    global similar_games
-    # 提取奖金信息
-    win_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['h'])
-    draw_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['d'])
-    lose_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['a'])
-
-    data, games = probability_of_simple(win_price, draw_price, lose_price)
-
-    for i in range(len(data)):
-        simple_result[0] += data[0][1] * 0.4
-
-    similar_games.update(games)
-
-    p = (
-        Pie()
-        .add('', data,
-             )
-    )
-    return p.dump_options_with_quotes()
-
-
-@forecast_blue.route("/rangPie", methods=['GET'])
-def get_rang_pie():
-    global similar_games
+    # ---------------------------------------让球胜平负奖金相似比赛---------------------------------------
     # 提取奖金信息
     rang_win_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['h'])
     rang_draw_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['d'])
@@ -112,22 +68,23 @@ def get_rang_pie():
 
     data, games = probability_of_rang(rang_win_price, rang_draw_price, rang_lose_price)
 
+    # sorted_games = sorted(games, key=lambda game: game.game_time, reverse=True)
+    #
+    # if len(sorted_games) > 20:
+    #     sorted_games = sorted_games[0:20]
+
     for i in range(len(data)):
-        rang_result[0] += data[0][1] * 0.4
+        rang_result[i] += data[i][1] * 0.4
 
-    similar_games.update(games)
+    # similar_games.update(sorted_games)
 
-    p = (
+    rp = (
         Pie()
         .add('', data,
              )
-    )
-    return p.dump_options_with_quotes()
+    ).dump_options_with_quotes()
 
-
-@forecast_blue.route("/simpleChangePie", methods=['GET'])
-def get_simple_change_pie():
-    global similar_games
+    # ---------------------------------------胜平负奖金变化相似比赛---------------------------------------
     # 提取奖金信息
     win_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['h']) - float(
         dict_data['value']['oddsHistory']['hadList'][0]['h'])
@@ -138,22 +95,23 @@ def get_simple_change_pie():
 
     data, games = probability_of_simpleChange(win_price, draw_price, lose_price)
 
+    # sorted_games = sorted(games, key = lambda game: game.game_time, reverse=True)
+    #
+    # if len(sorted_games) > 20:
+    #     sorted_games = sorted_games[0:20]
+
     for i in range(len(data)):
-        simple_result[0] += data[0][1] * 0.6
+        simple_result[i] += data[i][1] * 0.6
 
-    similar_games.update(games)
+    # similar_games.update(sorted_games)
 
-    p = (
+    scp = (
         Pie()
         .add('', data,
              )
-    )
+    ).dump_options_with_quotes()
 
-    return p.dump_options_with_quotes()
-
-@forecast_blue.route("/rangChangePie", methods=['GET'])
-def get_rang_change_pie():
-    global similar_games
+    # -------------------------------------让球胜平负奖金变化相似比赛-------------------------------------
     # 提取奖金信息
     rang_win_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['h']) - float(
         dict_data['value']['oddsHistory']['hhadList'][0]['h'])
@@ -164,21 +122,23 @@ def get_rang_change_pie():
 
     data, games = probability_of_rangChange(rang_win_price, rang_draw_price, rang_lose_price)
 
+    # sorted_games = sorted(games, key = lambda game: game.game_time, reverse=True)
+    #
+    # if len(sorted_games) > 20:
+    #     sorted_games = sorted_games[0:20]
+
     for i in range(len(data)):
-        rang_result[0] += data[0][1] * 0.6
+        rang_result[i] += data[i][1] * 0.6
 
-    similar_games.update(games)
+    # similar_games.update(sorted_games)
 
-    p = (
+    rcp = (
         Pie()
         .add('', data,
              )
-    )
+    ).dump_options_with_quotes()
 
-    return p.dump_options_with_quotes()
-
-@forecast_blue.route("/simpleLine", methods=['GET'])
-def get_simple_line():
+    # -------------------------------------胜平负奖金变化趋势-------------------------------------
     temp = dict(x=[], win=[], draw=[], lose=[])
 
     for i, dic in enumerate(dict_data['value']['oddsHistory']['hadList']):
@@ -187,19 +147,16 @@ def get_simple_line():
         temp['draw'].append(float(dic['d']))
         temp['lose'].append(float(dic['a']))
 
-    line = (
+    sl = (
         Line()
         .add_xaxis(xaxis_data=temp['x'])
         .add_yaxis(series_name='胜', y_axis=temp['win'], symbol='arrow', is_symbol_show=True)
         .add_yaxis(series_name='平', y_axis=temp['draw'], symbol='rect', is_symbol_show=True)
         .add_yaxis(series_name='负', y_axis=temp['lose'])
         .set_global_opts(title_opts=opts.TitleOpts(title='胜平负数据变化图'))
-    )
+    ).dump_options_with_quotes()
 
-    return line.dump_options_with_quotes()
-
-@forecast_blue.route("/rangLine", methods=['GET'])
-def get_rang_line():
+    # -------------------------------------让球胜平负奖金变化趋势-------------------------------------
     temp = dict(x=[], win=[], draw=[], lose=[])
 
     for i, dic in enumerate(dict_data['value']['oddsHistory']['hhadList']):
@@ -208,13 +165,33 @@ def get_rang_line():
         temp['draw'].append(float(dic['d']))
         temp['lose'].append(float(dic['a']))
 
-    line = (
+    rl = (
         Line()
         .add_xaxis(xaxis_data=temp['x'])
         .add_yaxis(series_name='胜', y_axis=temp['win'], symbol='arrow', is_symbol_show=True)
         .add_yaxis(series_name='平', y_axis=temp['draw'], symbol='rect', is_symbol_show=True)
         .add_yaxis(series_name='负', y_axis=temp['lose'])
         .set_global_opts(title_opts=opts.TitleOpts(title='让球数据变化图'))
-    )
+    ).dump_options_with_quotes()
 
-    return line.dump_options_with_quotes()
+    # ---------------------------------------------------------------------------------------
+    print(simple_result)
+    print(rang_result)
+
+    similarGames = json.dumps([{
+        'id':game.id,
+        'dan':game.dan,
+        'host':Team.query.filter_by(id=game.host_id).first().name,
+        'guest':Team.query.filter_by(id=game.guest_id).first().name,
+        'game_time':game.game_time.strftime('%Y-%m-%d %H:%M:%S'),
+        'session':game.session,
+        'simple':game.simple,
+        'rang':game.rang,
+        'score':game.score,
+        'goals':game.goals,
+        'half':game.half,
+        'url':game.url
+    } for game in similar_games])
+
+    return render_template('forecast.html', simplePie = sp, rangPie = rp, simpleChangePie = scp, rangChangePie = rcp, simpleLine = sl, rangLine = rl, similarGames=similarGames)
+    # return render_template('forecast.html', simplePie = sp, rangPie = rp, simpleChangePie = scp, rangChangePie = rcp, simpleLine = sl, rangLine = rl)

@@ -35,113 +35,68 @@
             </div>
         </div>
     </div>
-    <div class="col-md-2 bg-dark rounded" id="gameList" style="height:400px;">
-        <div class="card text-center">
-            <p>胜平负分析</p>
-            <p>让球分析</p>
-        </div>
-    </div>
-    <div class="col-md-5 rounded" style="height:400px;">
+    <div class="col-md-6 rounded" style="height:400px;">
         <div class="card text-center">
             <div class="card-body" id="simpleLine">
             </div>
         </div>
     </div>
-    <div class="col-md-5 rounded" style="height:400px;">
+    <div class="col-md-6 rounded" style="height:400px;">
         <div class="card text-center">
             <div class="card-body" id="rangLine">
             </div>
         </div>
     </div>
+    <div class="col-md-12 rounded">
+        <div class="card text-center">
+            <table class="card-body" id="similarGames">
+                <thead>
+                    <tr>
+                        <th data-field="session">比赛场次</th>
+                        <th data-field="host">主队</th>
+                        <th data-field="guest">客队</th>
+                        <th data-field="score">比分</th>
+                        <th data-field="simple">胜平负</th>
+                        <th data-field="rang">让球</th>
+                        <th data-field="half">半全场</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-
     <script>
         $(
             function () {
-// <!--                var histogram = echarts.init(document.getElementById('bar'), 'white', {renderer: 'canvas'});-->
-// <!--                $.ajax({-->
-// <!--                    type: "GET",-->
-// <!--                    url: "http://127.0.0.1:5000/barChart",-->
-// <!--                    dataType: 'json',-->
-// <!--                    success: function (result) {-->
-// <!--                        histogram.setOption(result);-->
-// <!--                    }-->
-// <!--                });-->
-
                 var simplePie = echarts.init(document.getElementById('simplePie'));
-                console.log({{ context.simplePie }});
-                simplePie.setOption({{ context.simplePie }});
-<!--                $.ajax({-->
-<!--                    type: "GET",-->
-<!--                    url: "http://127.0.0.1:5000/forecast/simplePie",-->
-<!--                    dataType: 'json',-->
-<!--                    success: function (result) {-->
-<!--                        simplePie.setOption(result);-->
-<!--                    }-->
-<!--                });-->
+                simplePie.setOption({{ simplePie|safe }});
 
                 var rangPie = echarts.init(document.getElementById('rangPie'));
-                $.ajax({
-                    type: "GET",
-                    url: "http://127.0.0.1:5000/forecast/rangPie",
-                    dataType: 'json',
-                    success: function (result) {
-                        rangPie.setOption(result);
-                    }
-                });
+                rangPie.setOption({{ rangPie|safe }});
 
                 var simpleChangePie = echarts.init(document.getElementById('simpleChangePie'));
-                $.ajax({
-                    type: "GET",
-                    url: "http://127.0.0.1:5000/forecast/simpleChangePie",
-                    dataType: 'json',
-                    success: function (result) {
-                        simpleChangePie.setOption(result);
-                    }
-                });
+                simpleChangePie.setOption({{ simpleChangePie|safe }});
 
                 var rangChangePie = echarts.init(document.getElementById('rangChangePie'));
-                $.ajax({
-                    type: "GET",
-                    url: "http://127.0.0.1:5000/forecast/rangChangePie",
-                    dataType: 'json',
-                    success: function (result) {
-                        rangChangePie.setOption(result);
-                    }
-                });
+                rangChangePie.setOption({{ rangChangePie|safe }});
 
                 var simpleLine = echarts.init(document.getElementById('simpleLine'));
-                $.ajax({
-                    type: "GET",
-                    url: "http://127.0.0.1:5000/forecast/simpleLine",
-                    dataType: 'json',
-                    success: function (result) {
-                        simpleLine.setOption(result);
-                    }
-                });
+                simpleLine.setOption({{ simpleLine|safe }});
 
                 var rangLine = echarts.init(document.getElementById('rangLine'));
-                $.ajax({
-                    type: "GET",
-                    url: "http://127.0.0.1:5000/forecast/rangLine",
-                    dataType: 'json',
-                    success: function (result) {
-                        rangLine.setOption(result);
-                        console.log(result);
-                    }
-                });
+                rangLine.setOption({{ rangLine|safe }});
 
-<!--                var rangLine = echarts.init(document.getElementById('rangLine'));-->
-                $.ajax({
-                    type: "GET",
-                    url: "http://127.0.0.1:5000/forecast/similarGames",
-                    dataType: 'json',
-                    success: function (result) {
-                        rangLine.setOption(result);
-                    }
-                });
+                // 从后端获取的 game 列表数据
+                var similarGames = {{ similarGames|safe }};
 
-                console.log(context.simplePie);
+                // 初始化 DataTables
+                $('#similarGames').bootstrapTable({
+                    data: similarGames,
+                    pagination: true,
+                    pageSize: 10  // 设置每页显示的行数
+                });
             }
         )
     </script>
