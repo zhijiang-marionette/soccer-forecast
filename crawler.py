@@ -2,7 +2,7 @@ import requests
 import json
 from models import *
 from datetime import datetime
-# from app import app
+from app import app
 
 # 爬取竞彩网开的赛事，并汇总成列表
 def get_game_list() -> list:
@@ -117,30 +117,14 @@ def get_results(matchId: int):
     if simple != '--':
         for i, dic in enumerate(dict_data['value']['oddsHistory']['hadList']):
             if i == 0:
-                win_price = float(dic['h'])
-                draw_price = float(dic['d'])
-                lose_price = float(dic['a'])
-
-                # 1.创建ORM对象
-                simple_first = Simple_first(game_id=game_id, win_price=win_price, draw_price=draw_price,
-                                            lose_price=lose_price)
-                # 2.将ORM对象添加到db.session中
-                db.session.add(simple_first)
-                # 3.将db.session中的改变同步到数据库中
-                db.session.commit()
+                win_begin_price = float(dic['h'])
+                draw_begin_price = float(dic['d'])
+                lose_begin_price = float(dic['a'])
 
             if i == len(dict_data['value']['oddsHistory']['hadList']) - 1:
-                win_price = float(dic['h'])
-                draw_price = float(dic['d'])
-                lose_price = float(dic['a'])
-
-                # 1.创建ORM对象
-                simple_final = Simple_final(game_id=game_id, win_price=win_price, draw_price=draw_price,
-                                            lose_price=lose_price)
-                # 2.将ORM对象添加到db.session中
-                db.session.add(simple_final)
-                # 3.将db.session中的改变同步到数据库中
-                db.session.commit()
+                win_end_price = float(dic['h'])
+                draw_end_price = float(dic['d'])
+                lose_end_price = float(dic['a'])
 
             date_time = datetime.strptime(dic['updateDate'] + ' ' + dic['updateTime'], '%Y-%m-%d %H:%M:%S')
             win_price = float(dic['h'])
@@ -155,34 +139,26 @@ def get_results(matchId: int):
             # 3.将db.session中的改变同步到数据库中
             db.session.commit()
 
+        if win_end_price - win_begin_price != 0 or draw_end_price - draw_begin_price != 0 or lose_end_price - lose_begin_price != 0:
+            # 1.创建ORM对象
+            simple_change = Simple_change(game_id=game_id, win_price=win_end_price - win_begin_price, draw_price=draw_end_price - draw_begin_price,
+                                          lose_price=lose_end_price - lose_begin_price)
+            # 2.将ORM对象添加到db.session中
+            db.session.add(simple_change)
+            # 3.将db.session中的改变同步到数据库中
+            db.session.commit()
+
     # 让球胜平负奖金
     for i, dic in enumerate(dict_data['value']['oddsHistory']['hhadList']):
         if i == 0:
-            rang_win_price = float(dic['h'])
-            rang_draw_price = float(dic['d'])
-            rang_lose_price = float(dic['a'])
-
-            # 1.创建ORM对象
-            rang_first = Rang_first(game_id=game_id, rang_win_price=rang_win_price,
-                        rang_draw_price=rang_draw_price, rang_lose_price=rang_lose_price)
-            # 2.将ORM对象添加到db.session中
-            db.session.add(rang_first)
-            # 3.将db.session中的改变同步到数据库中
-            db.session.commit()
+            rang_win_begin_price = float(dic['h'])
+            rang_draw_begin_price = float(dic['d'])
+            rang_lose_begin_price = float(dic['a'])
 
         if i == len(dict_data['value']['oddsHistory']['hhadList']) - 1:
-            rangfou = dic['goalLine']
-            rang_win_price = float(dic['h'])
-            rang_draw_price = float(dic['d'])
-            rang_lose_price = float(dic['a'])
-
-            # 1.创建ORM对象
-            rang_final = Rang_final(rangfou=rangfou, game_id=game_id, rang_win_price=rang_win_price,
-                        rang_draw_price=rang_draw_price, rang_lose_price=rang_lose_price)
-            # 2.将ORM对象添加到db.session中
-            db.session.add(rang_final)
-            # 3.将db.session中的改变同步到数据库中
-            db.session.commit()
+            rang_win_end_price = float(dic['h'])
+            rang_draw_end_price = float(dic['d'])
+            rang_lose_end_price = float(dic['a'])
 
         date_time = datetime.strptime(dic['updateDate'] + ' ' + dic['updateTime'], '%Y-%m-%d %H:%M:%S')
         rangfou = dic['goalLine']
@@ -195,6 +171,15 @@ def get_results(matchId: int):
                     rang_draw_price=rang_draw_price, rang_lose_price=rang_lose_price)
         # 2.将ORM对象添加到db.session中
         db.session.add(rang)
+        # 3.将db.session中的改变同步到数据库中
+        db.session.commit()
+    if rang_win_end_price - rang_win_begin_price != 0 or rang_draw_end_price - rang_draw_begin_price != 0 or rang_lose_end_price - rang_lose_begin_price != 0:
+        # 1.创建ORM对象
+        rang_change = Rang_change(game_id=game_id, rang_win_price=rang_win_end_price - rang_win_begin_price,
+                                      rang_draw_price=rang_draw_end_price - rang_draw_begin_price,
+                                      rang_lose_price=rang_lose_end_price - rang_lose_begin_price)
+        # 2.将ORM对象添加到db.session中
+        db.session.add(rang_change)
         # 3.将db.session中的改变同步到数据库中
         db.session.commit()
 
@@ -243,86 +228,12 @@ def get_results(matchId: int):
 
 # -----------------------------返回历史奖金信息------------------------------------End
 
-# 处理胜平负奖金以及让球胜平负奖金的变化数据
-def data_change():
-    # 胜平负奖金
-    # 获取所有的记录
-    simple_first_entries = Simple_first.query.all()
-    simple_final_entries = Simple_final.query.all()
-
-    # 将Simple_final的数据以字典形式存储，以便后续匹配
-    simple_final_data = {entry.game_id: entry for entry in simple_final_entries}
-
-    i = 1
-
-    for entry1 in simple_first_entries:
-        game_id = entry1.game_id
-        if game_id in simple_final_data:
-            entry2 = simple_final_data[game_id]
-
-            result_field1 = entry2.win_price - entry1.win_price
-            result_field2 = entry2.draw_price - entry1.draw_price
-            result_field3 = entry2.lose_price - entry1.lose_price
-
-            result_entry = Simple_change(
-                game_id=game_id,
-                win_price=result_field1,
-                draw_price=result_field2,
-                lose_price=result_field3
-            )
-
-            db.session.add(result_entry)
-            db.session.commit()
-
-        i += 1
-        if i % 1000 == 0:
-            print('胜平负奖金处理已完成', i)
-
-    # 让球胜平负奖金
-    # 获取所有的记录
-    rang_first_entries = Rang_first.query.all()
-    rang_final_entries = Rang_final.query.all()
-
-    # 将rang_final的数据以字典形式存储，以便后续匹配
-    rang_first_data = {entry.game_id: entry for entry in rang_first_entries}
-
-    # 获取rang_change所有数据
-    rang_change_entries = Rang_change.query.all()
-    # 将rang_change的数据以字典形式存储，以便跳过循环
-    rang_change_data = {entry.game_id: entry for entry in rang_change_entries}
-
-    i = 1
-
-    for entry1 in rang_final_entries:
-        game_id = entry1.game_id
-        if game_id in rang_change_data:
-            continue
-        if game_id in rang_first_data:
-            entry2 = rang_first_data[game_id]
-
-            result_field1 = entry1.rang_win_price - entry2.rang_win_price
-            result_field2 = entry1.rang_draw_price - entry2.rang_draw_price
-            result_field3 = entry1.rang_lose_price - entry2.rang_lose_price
-
-            result_entry = Rang_change(
-                game_id=game_id,
-                rang_win_price=result_field1,
-                rang_draw_price=result_field2,
-                rang_lose_price=result_field3
-            )
-
-            db.session.add(result_entry)
-            db.session.commit()
-
-        i += 1
-        if i % 1000 == 0:
-            print('已完成', i)
-
-# with app.app_context():
-#     for matchId in range(1021134, 1023104):
-#         get_results(matchId)
-#         if matchId % 100 == 0:
-#             print(matchId, '已完成')
+with app.app_context():
+    # for matchId in range(1000267, 1024576):
+    for matchId in range(1014576, 1024576):
+        get_results(matchId)
+        if matchId % 100 == 0:
+            print(matchId, '已完成', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     # print(get_game_list())
 
 # 删除错误比赛记录
