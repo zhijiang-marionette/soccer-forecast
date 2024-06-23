@@ -2,7 +2,7 @@ import requests
 import json
 from models import *
 from datetime import datetime
-from app import app
+# from app import app
 
 # 爬取竞彩网开的赛事，并汇总成列表
 def get_game_list() -> list:
@@ -23,6 +23,11 @@ def get_game_list() -> list:
                         time=dic['matchDate'] + ' ' + dic['matchTime'], game_id=dic['matchId'])
             res.append(game)
 
+    # 查询数据表的最后一条记录
+    last_record = Game.query.order_by(Game.id.desc()).first().url[-7:]
+    for matchId in range(int(last_record) + 1, res[0]['game_id']):
+        get_results(matchId)
+        print(matchId, "爬取成功")
     return res
 
 def get_results(matchId: int):
@@ -228,12 +233,12 @@ def get_results(matchId: int):
 
 # -----------------------------返回历史奖金信息------------------------------------End
 
-with app.app_context():
-    # for matchId in range(1000267, 1024576):
-    for matchId in range(1014576, 1024576):
-        get_results(matchId)
-        if matchId % 100 == 0:
-            print(matchId, '已完成', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+# with app.app_context():
+#     # for matchId in range(1000267, 1024576):
+#     for matchId in range(1017317, 1024576):
+#         get_results(matchId)
+#         if matchId % 100 == 0:
+#             print(matchId, '已完成', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     # print(get_game_list())
 
 # 删除错误比赛记录
@@ -255,3 +260,50 @@ with app.app_context():
 #             db.session.commit()
 #         else:
 #             break
+# 测试获取数据变化列
+# with app.app_context():
+#     from sqlalchemy import func, desc
+#     from sqlalchemy.orm import aliased
+#
+#     # 窗口函数，给每个分组的行编号
+#     from sqlalchemy import over
+#
+#     row_number = func.row_number().over(partition_by=Simple.game_id, order_by=desc(Simple.date_time)).label('row_number')
+#
+#     # 子查询，包含窗口函数的编号
+#     subquery = db.session.query(
+#         Simple,
+#         row_number
+#     ).subquery()
+#
+#     # 创建一个别名以便于查询
+#     alias_subquery = aliased(Simple, subquery)
+#
+#     # 主查询，过滤出编号为1的行
+#     query = db.session.query(alias_subquery).filter(subquery.c.row_number == 1)
+#
+#     # 执行查询并获取结果
+#     simple_finals = query.all()
+#     simple_final_similar_games = []
+#     for simple_final in simple_finals:
+#         if (simple_final.win_price - 2.31) ** 2 + (simple_final.draw_price - 3.73) ** 2 + (simple_final.lose_price - 2.41) ** 2 < 0.0075:
+#             simple_final_similar_games.append(simple_final.game_id)
+#             print(simple_final.win_price, simple_final.draw_price, simple_final.lose_price)
+#     # 根据索引在数据库中检索
+#     games = Game.query.filter(Game.id.in_(simple_final_similar_games)).all()
+#
+#     # 得到比赛结果列表
+#     simples = [game.simple for game in games]
+#
+#     # 计算三种结果比例
+#     total_matches = len(simples)
+#     win_count = simples.count('胜')
+#     draw_count = simples.count('平')
+#     loss_count = simples.count('负')
+#
+#     win_percentage = (win_count / total_matches) * 100
+#     draw_percentage = (draw_count / total_matches) * 100
+#     lose_percentage = (loss_count / total_matches) * 100
+#
+#     print(f'胜利比率为{win_percentage}, 平局比率为{draw_percentage}, 失败比率为{lose_percentage}')
+#

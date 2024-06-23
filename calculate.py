@@ -1,31 +1,42 @@
 import numpy as np
 from models import *
+from sqlalchemy import func, desc
+from sqlalchemy.orm import aliased
 
-def probability_of_simple(win: float, draw: float, lose: float):
-    simple_finals = Simple_final.query.with_entities(Simple_final.win_price, Simple_final.draw_price,
-                                                     Simple_final.lose_price).all()
-    arr_nx3 = np.array(simple_finals)
+def probability_of_simple(win: float, draw: float, lose: float, first: bool):
+    # 窗口函数，给每个分组的行编号
+    if first == True:
+        row_number = func.row_number().over(partition_by=Simple.game_id, order_by=desc(Simple.date_time)).label(
+            'row_number')
+    else:
+        row_number = func.row_number().over(partition_by=Simple.game_id, order_by=Simple.date_time).label(
+            'row_number')
 
-    # 创建1x3和3x3的numpy数组
-    array_1x3 = np.array([win, draw, lose])
+    # 子查询，包含窗口函数的编号
+    subquery = db.session.query(
+        Simple,
+        row_number
+    ).subquery()
 
-    # 使用广播计算差值
-    diff = arr_nx3 - array_1x3.reshape(1, -1)
+    # 创建一个别名以便于查询
+    alias_subquery = aliased(Simple, subquery)
 
-    # 计算每个元素的平方
-    squared_diff = diff ** 2
+    # 主查询，过滤出编号为1的行
+    query = db.session.query(alias_subquery).filter(subquery.c.row_number == 1)
 
-    # 沿着第一个轴（axis=1）求和
-    sum_squared_diff = np.sum(squared_diff, axis=1)
+    print(first)
 
-    # 对结果开根号，得到欧几里得距离
-    euclidean_distance = np.sqrt(sum_squared_diff)
-
-    # 找到这些元素的索引, 取得是每一个奖金差距在0.04以内
-    indices_below_threshold = np.where(euclidean_distance < 0.0692)[0] + 1
-
+    # 执行查询并获取结果
+    simple_finals = query.all()
+    simple_final_similar_games = []
+    for simple_final in simple_finals:
+        if (simple_final.win_price - win) ** 2 + (simple_final.draw_price - draw) ** 2 + (
+                simple_final.lose_price - lose) ** 2 < 0.0075:
+            simple_final_similar_games.append(simple_final.game_id)
     # 根据索引在数据库中检索
-    games = Game.query.filter(Game.id.in_(indices_below_threshold)).all()
+    games = Game.query.filter(Game.id.in_(simple_final_similar_games)).all()
+
+    print(games)
 
     # 得到比赛结果列表
     simples = [game.simple for game in games]
@@ -44,33 +55,36 @@ def probability_of_simple(win: float, draw: float, lose: float):
             ['平局', draw_percentage],
             ['失败', lose_percentage]], games
 
-def probability_of_rang(rang_win: float, rang_draw: float, rang_lose: float):
-    # 导出数据库中所有截止时间的赔率
-    rang_finals = Rang_final.query.with_entities(Rang_final.rang_win_price, Rang_final.rang_draw_price,
-                                                     Rang_final.rang_lose_price).all()
-    arr_nx3 = np.array(rang_finals)
+def probability_of_rang(rang_win: float, rang_draw: float, rang_lose: float, first: bool):
+    # 窗口函数，给每个分组的行编号
+    if first == True:
+        row_number = func.row_number().over(partition_by=Rang.game_id, order_by=desc(Rang.date_time)).label(
+            'row_number')
+    else:
+        row_number = func.row_number().over(partition_by=Rang.game_id, order_by=Rang.date_time).label(
+            'row_number')
 
-    # 创建1x3和3x3的numpy数组
-    array_1x3 = np.array([rang_win, rang_draw, rang_lose])
+    # 子查询，包含窗口函数的编号
+    subquery = db.session.query(
+        Rang,
+        row_number
+    ).subquery()
 
-    # rangs = ['(' + rang + ')' + ' ' + '胜', '(' + rang + ')' + ' ' + '平', '(' + rang + ')' + ' ' + '负']
-    # 使用广播计算差值
-    diff = arr_nx3 - array_1x3.reshape(1, -1)
+    # 创建一个别名以便于查询
+    alias_subquery = aliased(Rang, subquery)
 
-    # 计算每个元素的平方
-    squared_diff = diff ** 2
+    # 主查询，过滤出编号为1的行
+    query = db.session.query(alias_subquery).filter(subquery.c.row_number == 1)
 
-    # 沿着第一个轴（axis=1）求和
-    sum_squared_diff = np.sum(squared_diff, axis=1)
-
-    # 对结果开根号，得到欧几里得距离
-    euclidean_distance = np.sqrt(sum_squared_diff)
-
-    # 找到这些元素的索引, 取得是每一个奖金差距在0.04以内
-    indices_below_threshold = np.where(euclidean_distance < 0.0692)[0] + 1
-
+    # 执行查询并获取结果
+    rang_finals = query.all()
+    rang_final_similar_games = []
+    for rang_final in rang_finals:
+        if (rang_final.rang_win_price - rang_win) ** 2 + (rang_final.rang_draw_price - rang_draw) ** 2 + (
+                rang_final.rang_lose_price - rang_lose) ** 2 < 0.0075:
+            rang_final_similar_games.append(rang_final.game_id)
     # 根据索引在数据库中检索
-    games = Game.query.filter(Game.id.in_(indices_below_threshold)).all()
+    games = Game.query.filter(Game.id.in_(rang_final_similar_games)).all()
 
     # 得到比赛结果列表
     rangs = [game.rang for game in games]

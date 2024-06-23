@@ -9,29 +9,29 @@
 <div class="row row-deck row-cards">
     <div class="col-md-3 rounded"style="height:300px;">
         <div class="card text-center">
-            <p>胜平负基础奖金</p>
-            <div class="card-body" id="simplePie">
+            <p>胜平负初盘</p>
+            <div class="card-body" id="simpleFirstPie">
             </div>
         </div>
     </div>
     <div class="col-md-3 rounded" style="height:300px;">
         <div class="card text-center">
-            <p>让胜平负基础奖金</p>
-            <div class="card-body" id="rangPie">
+            <p>让球初盘</p>
+            <div class="card-body" id="rangFirstPie">
             </div>
         </div>
     </div>
     <div class="col-md-3 rounded" style="height:300px;">
         <div class="card text-center">
-            <p>胜平负盘口变化</p>
-            <div class="card-body" id="simpleChangePie">
+            <p>胜平负实时</p>
+            <div class="card-body" id="simpleLastPie">
             </div>
         </div>
     </div>
     <div class="col-md-3 rounded" style="height:300px;">
         <div class="card text-center">
-            <p>让胜平负盘口变化</p>
-            <div class="card-body" id="rangChangePie">
+            <p>让球实时</p>
+            <div class="card-body" id="rangLastPie">
             </div>
         </div>
     </div>
@@ -70,17 +70,17 @@
     <script>
         $(
             function () {
-                var simplePie = echarts.init(document.getElementById('simplePie'));
-                simplePie.setOption({{ simplePie|safe }});
+                var simpleFirstPie = echarts.init(document.getElementById('simpleFirstPie'));
+                simpleFirstPie.setOption({{ simpleFirstPie|safe }});
 
-                var rangPie = echarts.init(document.getElementById('rangPie'));
-                rangPie.setOption({{ rangPie|safe }});
+                var rangFirstPie = echarts.init(document.getElementById('rangFirstPie'));
+                rangFirstPie.setOption({{ rangFirstPie|safe }});
 
-                var simpleChangePie = echarts.init(document.getElementById('simpleChangePie'));
-                simpleChangePie.setOption({{ simpleChangePie|safe }});
+                var simpleLastPie = echarts.init(document.getElementById('simpleLastPie'));
+                simpleLastPie.setOption({{ simpleLastPie|safe }});
 
-                var rangChangePie = echarts.init(document.getElementById('rangChangePie'));
-                rangChangePie.setOption({{ rangChangePie|safe }});
+                var rangLastPie = echarts.init(document.getElementById('rangLastPie'));
+                rangLastPie.setOption({{ rangLastPie|safe }});
 
                 var simpleLine = echarts.init(document.getElementById('simpleLine'));
                 simpleLine.setOption({{ simpleLine|safe }});

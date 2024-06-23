@@ -36,13 +36,13 @@ def home(Id):
     # 解析返回内容，转换为字典格式
     dict_data = json.loads(html)
 
-    # -----------------------------------------胜平负奖金相似比赛-----------------------------------------
+    # -----------------------------------------胜平负奖金相似（实时）比赛-----------------------------------------
     # 提取奖金信息
     win_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['h'])
     draw_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['d'])
     lose_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['a'])
 
-    data, games = probability_of_simple(win_price, draw_price, lose_price)
+    data, games = probability_of_simple(win_price, draw_price, lose_price, False)
 
     sorted_games = sorted(games, key = lambda game: game.game_time, reverse=True)
 
@@ -50,23 +50,47 @@ def home(Id):
         sorted_games = sorted_games[0:20]
 
     for i in range(len(data)):
-        simple_result[i] += data[i][1] * 0.4
+        simple_result[i] += data[i][1]
 
     # similar_games.update(sorted_games)
 
-    sp = (
+    slp = (
         Pie()
         .add('', data,
              )
     ).dump_options_with_quotes()
 
-    # ---------------------------------------让球胜平负奖金相似比赛---------------------------------------
+    # -----------------------------------------胜平负奖金相似（初盘）比赛-----------------------------------------
+    # 提取奖金信息
+    win_price = float(dict_data['value']['oddsHistory']['hadList'][0]['h'])
+    draw_price = float(dict_data['value']['oddsHistory']['hadList'][0]['d'])
+    lose_price = float(dict_data['value']['oddsHistory']['hadList'][0]['a'])
+
+    data, games = probability_of_simple(win_price, draw_price, lose_price, True)
+
+    sorted_games = sorted(games, key = lambda game: game.game_time, reverse=True)
+
+    if len(sorted_games) > 20:
+        sorted_games = sorted_games[0:20]
+
+    for i in range(len(data)):
+        simple_result[i] += data[i][1]
+
+    # similar_games.update(sorted_games)
+
+    sfp = (
+        Pie()
+        .add('', data,
+             )
+    ).dump_options_with_quotes()
+
+    # ---------------------------------------让球胜平负奖金相似（实时）比赛---------------------------------------
     # 提取奖金信息
     rang_win_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['h'])
     rang_draw_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['d'])
     rang_lose_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['a'])
 
-    data, games = probability_of_rang(rang_win_price, rang_draw_price, rang_lose_price)
+    data, games = probability_of_rang(rang_win_price, rang_draw_price, rang_lose_price, False)
 
     # sorted_games = sorted(games, key=lambda game: game.game_time, reverse=True)
     #
@@ -74,69 +98,93 @@ def home(Id):
     #     sorted_games = sorted_games[0:20]
 
     for i in range(len(data)):
-        rang_result[i] += data[i][1] * 0.4
+        rang_result[i] += data[i][1]
 
     # similar_games.update(sorted_games)
 
-    rp = (
+    rlp = (
         Pie()
         .add('', data,
              )
     ).dump_options_with_quotes()
 
-    # ---------------------------------------胜平负奖金变化相似比赛---------------------------------------
+    # ---------------------------------------让球胜平负奖金相似（初盘）比赛---------------------------------------
     # 提取奖金信息
-    win_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['h']) - float(
-        dict_data['value']['oddsHistory']['hadList'][0]['h'])
-    draw_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['d']) - float(
-        dict_data['value']['oddsHistory']['hadList'][0]['d'])
-    lose_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['a']) - float(
-        dict_data['value']['oddsHistory']['hadList'][0]['a'])
+    rang_win_price = float(dict_data['value']['oddsHistory']['hhadList'][0]['h'])
+    rang_draw_price = float(dict_data['value']['oddsHistory']['hhadList'][0]['d'])
+    rang_lose_price = float(dict_data['value']['oddsHistory']['hhadList'][0]['a'])
 
-    data, games = probability_of_simpleChange(win_price, draw_price, lose_price)
+    data, games = probability_of_rang(rang_win_price, rang_draw_price, rang_lose_price, True)
 
-    # sorted_games = sorted(games, key = lambda game: game.game_time, reverse=True)
+    # sorted_games = sorted(games, key=lambda game: game.game_time, reverse=True)
     #
     # if len(sorted_games) > 20:
     #     sorted_games = sorted_games[0:20]
 
     for i in range(len(data)):
-        simple_result[i] += data[i][1] * 0.6
+        rang_result[i] += data[i][1]
 
     # similar_games.update(sorted_games)
 
-    scp = (
+    rfp = (
         Pie()
         .add('', data,
              )
     ).dump_options_with_quotes()
 
-    # -------------------------------------让球胜平负奖金变化相似比赛-------------------------------------
-    # 提取奖金信息
-    rang_win_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['h']) - float(
-        dict_data['value']['oddsHistory']['hhadList'][0]['h'])
-    rang_draw_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['d']) - float(
-        dict_data['value']['oddsHistory']['hhadList'][0]['d'])
-    rang_lose_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['a']) - float(
-        dict_data['value']['oddsHistory']['hhadList'][0]['a'])
-
-    data, games = probability_of_rangChange(rang_win_price, rang_draw_price, rang_lose_price)
-
-    # sorted_games = sorted(games, key = lambda game: game.game_time, reverse=True)
+    # # ---------------------------------------胜平负奖金变化相似比赛---------------------------------------
+    # # 提取奖金信息
+    # win_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['h']) - float(
+    #     dict_data['value']['oddsHistory']['hadList'][0]['h'])
+    # draw_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['d']) - float(
+    #     dict_data['value']['oddsHistory']['hadList'][0]['d'])
+    # lose_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['a']) - float(
+    #     dict_data['value']['oddsHistory']['hadList'][0]['a'])
     #
-    # if len(sorted_games) > 20:
-    #     sorted_games = sorted_games[0:20]
-
-    for i in range(len(data)):
-        rang_result[i] += data[i][1] * 0.6
-
-    # similar_games.update(sorted_games)
-
-    rcp = (
-        Pie()
-        .add('', data,
-             )
-    ).dump_options_with_quotes()
+    # data, games = probability_of_simpleChange(win_price, draw_price, lose_price)
+    #
+    # # sorted_games = sorted(games, key = lambda game: game.game_time, reverse=True)
+    # #
+    # # if len(sorted_games) > 20:
+    # #     sorted_games = sorted_games[0:20]
+    #
+    # for i in range(len(data)):
+    #     simple_result[i] += data[i][1] * 0.6
+    #
+    # # similar_games.update(sorted_games)
+    #
+    # scp = (
+    #     Pie()
+    #     .add('', data,
+    #          )
+    # ).dump_options_with_quotes()
+    #
+    # # -------------------------------------让球胜平负奖金变化相似比赛-------------------------------------
+    # # 提取奖金信息
+    # rang_win_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['h']) - float(
+    #     dict_data['value']['oddsHistory']['hhadList'][0]['h'])
+    # rang_draw_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['d']) - float(
+    #     dict_data['value']['oddsHistory']['hhadList'][0]['d'])
+    # rang_lose_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['a']) - float(
+    #     dict_data['value']['oddsHistory']['hhadList'][0]['a'])
+    #
+    # data, games = probability_of_rangChange(rang_win_price, rang_draw_price, rang_lose_price)
+    #
+    # # sorted_games = sorted(games, key = lambda game: game.game_time, reverse=True)
+    # #
+    # # if len(sorted_games) > 20:
+    # #     sorted_games = sorted_games[0:20]
+    #
+    # for i in range(len(data)):
+    #     rang_result[i] += data[i][1] * 0.6
+    #
+    # # similar_games.update(sorted_games)
+    #
+    # rcp = (
+    #     Pie()
+    #     .add('', data,
+    #          )
+    # ).dump_options_with_quotes()
 
     # -------------------------------------胜平负奖金变化趋势-------------------------------------
     temp = dict(x=[], win=[], draw=[], lose=[])
@@ -156,7 +204,7 @@ def home(Id):
         .set_global_opts(title_opts=opts.TitleOpts(title='胜平负数据变化图'))
     ).dump_options_with_quotes()
 
-    # -------------------------------------让球胜平负奖金变化趋势-------------------------------------
+    # -------------------------------------让球奖金变化趋势-------------------------------------
     temp = dict(x=[], win=[], draw=[], lose=[])
 
     for i, dic in enumerate(dict_data['value']['oddsHistory']['hhadList']):
@@ -175,9 +223,6 @@ def home(Id):
     ).dump_options_with_quotes()
 
     # ---------------------------------------------------------------------------------------
-    print(simple_result)
-    print(rang_result)
-
     similarGames = json.dumps([{
         'id':game.id,
         'dan':game.dan,
@@ -193,5 +238,5 @@ def home(Id):
         'url':game.url
     } for game in similar_games])
 
-    return render_template('forecast.html', simplePie = sp, rangPie = rp, simpleChangePie = scp, rangChangePie = rcp, simpleLine = sl, rangLine = rl, similarGames=similarGames)
+    return render_template('forecast.html', simpleFirstPie = sfp, rangFirstPie = rfp, simpleLastPie = slp, rangLastPie = rlp, simpleLine = sl, rangLine = rl, similarGames=similarGames)
     # return render_template('forecast.html', simplePie = sp, rangPie = rp, simpleChangePie = scp, rangChangePie = rcp, simpleLine = sl, rangLine = rl)

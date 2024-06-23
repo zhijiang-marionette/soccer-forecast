@@ -5,7 +5,7 @@ import config
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from blueprints.forecast_blue import forecast_blue
-# from crawler import get_game_list, get_results
+from crawler import get_game_list, get_results
 import json
 
 app = Flask(__name__)
