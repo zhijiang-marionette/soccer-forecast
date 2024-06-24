@@ -46,13 +46,13 @@ def home(Id):
 
     sorted_games = sorted(games, key = lambda game: game.game_time, reverse=True)
 
-    if len(sorted_games) > 20:
-        sorted_games = sorted_games[0:20]
+    if len(sorted_games) > 10:
+        sorted_games = sorted_games[0:10]
 
     for i in range(len(data)):
         simple_result[i] += data[i][1]
 
-    # similar_games.update(sorted_games)
+    similar_games.extend(sorted_games)
 
     slp = (
         Pie()
@@ -70,13 +70,13 @@ def home(Id):
 
     sorted_games = sorted(games, key = lambda game: game.game_time, reverse=True)
 
-    if len(sorted_games) > 20:
-        sorted_games = sorted_games[0:20]
+    if len(sorted_games) > 10:
+        sorted_games = sorted_games[0:10]
 
     for i in range(len(data)):
         simple_result[i] += data[i][1]
 
-    # similar_games.update(sorted_games)
+    similar_games.extend(sorted_games)
 
     sfp = (
         Pie()
@@ -90,17 +90,17 @@ def home(Id):
     rang_draw_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['d'])
     rang_lose_price = float(dict_data['value']['oddsHistory']['hhadList'][-1]['a'])
 
-    data, games = probability_of_rang(rang_win_price, rang_draw_price, rang_lose_price, False)
+    data, games = probability_of_rang(rang_win_price, rang_draw_price, rang_lose_price, False, int(dict_data['value']['oddsHistory']['hhadList'][-1]['goalLine']))
 
-    # sorted_games = sorted(games, key=lambda game: game.game_time, reverse=True)
-    #
-    # if len(sorted_games) > 20:
-    #     sorted_games = sorted_games[0:20]
+    sorted_games = sorted(games, key=lambda game: game.game_time, reverse=True)
+
+    if len(sorted_games) > 10:
+        sorted_games = sorted_games[0:10]
 
     for i in range(len(data)):
         rang_result[i] += data[i][1]
 
-    # similar_games.update(sorted_games)
+    similar_games.extend(sorted_games)
 
     rlp = (
         Pie()
@@ -114,17 +114,17 @@ def home(Id):
     rang_draw_price = float(dict_data['value']['oddsHistory']['hhadList'][0]['d'])
     rang_lose_price = float(dict_data['value']['oddsHistory']['hhadList'][0]['a'])
 
-    data, games = probability_of_rang(rang_win_price, rang_draw_price, rang_lose_price, True)
+    data, games = probability_of_rang(rang_win_price, rang_draw_price, rang_lose_price, True, int(dict_data['value']['oddsHistory']['hhadList'][-1]['goalLine']))
 
-    # sorted_games = sorted(games, key=lambda game: game.game_time, reverse=True)
-    #
-    # if len(sorted_games) > 20:
-    #     sorted_games = sorted_games[0:20]
+    sorted_games = sorted(games, key=lambda game: game.game_time, reverse=True)
+
+    if len(sorted_games) > 10:
+        sorted_games = sorted_games[0:10]
 
     for i in range(len(data)):
         rang_result[i] += data[i][1]
 
-    # similar_games.update(sorted_games)
+    similar_games.extend(sorted_games)
 
     rfp = (
         Pie()

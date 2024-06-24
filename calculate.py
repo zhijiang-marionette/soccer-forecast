@@ -55,7 +55,7 @@ def probability_of_simple(win: float, draw: float, lose: float, first: bool):
             ['平局', draw_percentage],
             ['失败', lose_percentage]], games
 
-def probability_of_rang(rang_win: float, rang_draw: float, rang_lose: float, first: bool):
+def probability_of_rang(rang_win: float, rang_draw: float, rang_lose: float, first: bool, rangfou: int):
     # 窗口函数，给每个分组的行编号
     if first == True:
         row_number = func.row_number().over(partition_by=Rang.game_id, order_by=desc(Rang.date_time)).label(
@@ -80,7 +80,7 @@ def probability_of_rang(rang_win: float, rang_draw: float, rang_lose: float, fir
     rang_finals = query.all()
     rang_final_similar_games = []
     for rang_final in rang_finals:
-        if (rang_final.rang_win_price - rang_win) ** 2 + (rang_final.rang_draw_price - rang_draw) ** 2 + (
+        if rangfou == rang_final.rangfou and (rang_final.rang_win_price - rang_win) ** 2 + (rang_final.rang_draw_price - rang_draw) ** 2 + (
                 rang_final.rang_lose_price - rang_lose) ** 2 < 0.0075:
             rang_final_similar_games.append(rang_final.game_id)
     # 根据索引在数据库中检索
