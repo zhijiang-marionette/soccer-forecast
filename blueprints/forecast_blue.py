@@ -38,9 +38,11 @@ def home(Id):
 
     # -----------------------------------------胜平负奖金相似（实时）比赛-----------------------------------------
     # 提取奖金信息
-    win_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['h'])
-    draw_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['d'])
-    lose_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['a'])
+    win_price, draw_price, lose_price = 0, 0, 0
+    if dict_data['value']['oddsHistory']['hadList']:
+        win_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['h'])
+        draw_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['d'])
+        lose_price = float(dict_data['value']['oddsHistory']['hadList'][-1]['a'])
 
     data, games = probability_of_simple(win_price, draw_price, lose_price, False)
 
@@ -62,9 +64,11 @@ def home(Id):
 
     # -----------------------------------------胜平负奖金相似（初盘）比赛-----------------------------------------
     # 提取奖金信息
-    win_price = float(dict_data['value']['oddsHistory']['hadList'][0]['h'])
-    draw_price = float(dict_data['value']['oddsHistory']['hadList'][0]['d'])
-    lose_price = float(dict_data['value']['oddsHistory']['hadList'][0]['a'])
+    win_price, draw_price, lose_price = 0, 0, 0
+    if dict_data['value']['oddsHistory']['hadList']:
+        win_price = float(dict_data['value']['oddsHistory']['hadList'][0]['h'])
+        draw_price = float(dict_data['value']['oddsHistory']['hadList'][0]['d'])
+        lose_price = float(dict_data['value']['oddsHistory']['hadList'][0]['a'])
 
     data, games = probability_of_simple(win_price, draw_price, lose_price, True)
 

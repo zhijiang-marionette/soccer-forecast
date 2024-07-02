@@ -24,8 +24,6 @@ def probability_of_simple(win: float, draw: float, lose: float, first: bool):
     # 主查询，过滤出编号为1的行
     query = db.session.query(alias_subquery).filter(subquery.c.row_number == 1)
 
-    print(first)
-
     # 执行查询并获取结果
     simple_finals = query.all()
     simple_final_similar_games = []
@@ -36,13 +34,11 @@ def probability_of_simple(win: float, draw: float, lose: float, first: bool):
     # 根据索引在数据库中检索
     games = Game.query.filter(Game.id.in_(simple_final_similar_games)).all()
 
-    print(games)
-
     # 得到比赛结果列表
     simples = [game.simple for game in games]
 
     # 计算三种结果比例
-    total_matches = len(simples)
+    total_matches = len(simples) + 0.000001
     win_count = simples.count('胜')
     draw_count = simples.count('平')
     loss_count = simples.count('负')
@@ -102,7 +98,7 @@ def probability_of_rang(rang_win: float, rang_draw: float, rang_lose: float, fir
             result.append('让负')
 
     # 计算三种结果比例
-    total_matches = len(result)
+    total_matches = len(result) + 0.000001
     rang_win_count = result.count('让胜')
     rang_draw_count = result.count('让平')
     rang_loss_count = result.count('让负')
